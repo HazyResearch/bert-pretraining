@@ -1,0 +1,8 @@
+[submodule "src/bert-pretraining/third_party/pytorch-pretrained-BERT"]
+	path = src/bert-pretraining/third_party/pytorch-pretrained-BERT
+	url = https://github.com/JianGoForIt/pytorch-pretrained-BERT.git
+	branch = dec89c0 
+[submodule "src/bert-pretraining/third_party/bert"]
+	path = src/bert-pretraining/third_party/bert
+	url = https://github.com/google-research/bert.git
+	branch = 0fce551
