@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# pushd ../../../data/bert
-# wget https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip
-# unzip uncased_L-12_H-768_A-12.zip
-# popd
+#mkdir -p ../../../data/bert 
+#pushd ../../../data/bert
+#wget https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip
+##sudo apt-get install zip
+#unzip uncased_L-12_H-768_A-12.zip
+#popd
 
 export BERT_BASE_DIR=~/bert-pretraining/data/bert/uncased_L-12_H-768_A-12
 #export BERT_BASE_DIR=gs://bert_models/2018_10_18/uncased_L-12_H-768_A-12
