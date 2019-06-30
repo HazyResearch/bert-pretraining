@@ -117,13 +117,31 @@ def subsample_wiki_id(article_id_dict="./output/common_article_id", subset_prop=
 	n_sample = math.floor(len(article_ids) * subset_prop)
 	return article_ids[:n_sample]
 
+def get_stat_on_final_res(path):
+	print("stats on ", path)
+	n_sent = 0
+	n_token = 0
+	with open(path, 'r') as f:
+		lines = f.readlines()
+		for line in lines:
+			if line != "\n":
+				n_sent += 1
+				n_token += len(line.split(" "))
+	print("# sent: ", n_sent, " # token ", n_token)
 
 if __name__ == "__main__":
-	path_wiki17 = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki17/wiki_json"
-	path_wiki18 = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki18/wiki_json"
+	# path_wiki17 = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki17/wiki_json"
+	# path_wiki18 = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki18/wiki_json"
+	# path_wiki17 = "../../data/wiki/wiki17/wiki_json"
+	# path_wiki18 = "../../data/wiki/wiki18/wiki_json"
+	path_wiki17 = sys.argv[1]
+	path_wiki18 = sys.argv[2]
+	n_subfiles = int(sys.argv[3])  # split into n subfiles tf record for efficient processing
+	print("wiki 17 path ", path_wiki17)
+	print("wiki 18 path ", path_wiki18)
 
-	# # generate wiki dump article id related meta data
-	# process_article_ids(path_wiki17, path_wiki18)
+	# generate wiki dump article id related meta data
+	process_article_ids(path_wiki17, path_wiki18)
 
 	# subsampling and get text file for tensorflow bert
 	common_subset_ids = subsample_wiki_id("./output/common_article_id")
@@ -152,7 +170,7 @@ if __name__ == "__main__":
 				for mproc in mprocs:
 					mproc.join()
 				mprocs = []
-				print("process done for ", path, " at ", i, " th sample out of ", len(raw_files))
+				print("raw file block processing done for ", path, " at ", i, " th sample out of ", len(raw_files))
 	# # test example
 	# f_in_name = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki17/wiki_json/AA/wiki_01"
 	# f_out_name = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki17/wiki_json/AA/sent_wiki_01"
@@ -160,27 +178,34 @@ if __name__ == "__main__":
 
 	# merge all the files into a smaller number of files
 	# for path in [path_wiki17, path_wiki18]:
-	n_subfiles = 100   # number of tf re ord to generate
-	approx_num_articles_total = 0
-	for path in [path_wiki17]:
+	for path in [path_wiki17, path_wiki18]:
 		proc_files = glob(path+'/*/wiki_*_sent')
 		proc_files = sorted(proc_files)
 		n_proc_file_per_subfiles = math.ceil(len(proc_files) / n_subfiles)
 		f_out = None
+		approx_num_articles_total = 0
 		for i, proc_file in enumerate(proc_files):
 			if i % n_proc_file_per_subfiles == 0:
-				full_file = path.replace("wiki_json", 'wiki_txt/wiki_bert_{}.txt'.format(i // n_proc_file_per_subfiles))
+				if n_subfiles == 1:
+					full_file = path.replace("wiki_json", 'wiki_txt/wiki_bert.txt')
+				else:
+					full_file = path.replace("wiki_json", 'wiki_txt/wiki_bert_{}.txt'.format(i // n_proc_file_per_subfiles))
 				if f_out is not None:
 					f_out.close()
 				f_out = open(full_file, 'w')
 			f_in = open(proc_file, 'r')
 			data = f_in.read()
 			f_in.close()
+			f_out.write(data)
 
 			f_in = open(proc_file, 'r')
 			approx_num_articles = len([x for x in f_in.readlines() if x == '\n'])
 			approx_num_articles_total += approx_num_articles
 			f_in.close()
-			print(i, len(proc_files), n_proc_file_per_subfiles, full_file, approx_num_articles_total, approx_num_articles)
-			f_out.write(data)
+			print("merged ", i, "files", len(proc_files), n_proc_file_per_subfiles, full_file, approx_num_articles_total, approx_num_articles)
+
+	# get final stats
+	get_stat_on_final_res(path_wiki17.replace('wiki_json', 'wiki_txt/wiki_bert.txt'))
+	get_stat_on_final_res(path_wiki18.replace('wiki_json', 'wiki_txt/wiki_bert.txt'))
+
 

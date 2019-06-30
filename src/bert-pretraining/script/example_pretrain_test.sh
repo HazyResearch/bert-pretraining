@@ -20,7 +20,7 @@ python ../third_party/bert/create_pretraining_data.py \
 
 python ../third_party/bert/run_pretraining.py \
   --input_file=/tmp/tf_examples.tfrecord \
-  --output_dir=/tmp/pretraining_output_double \
+  --output_dir=/tmp/pretraining_output_int \
   --do_train=True \
   --do_eval=True \
   --bert_config_file=$BERT_BASE_DIR/bert_config.json \
@@ -32,11 +32,14 @@ python ../third_party/bert/run_pretraining.py \
   --learning_rate=2e-5 
   # --init_checkpoint=$BERT_BASE_DIR/bert_model.ckpt
 
-export BERT_BASE_DIR_NEW=/tmp/pretraining_output
+export BERT_BASE_DIR_NEW=/tmp/pretraining_output_int
 pytorch_pretrained_bert convert_tf_checkpoint_to_pytorch \
   $BERT_BASE_DIR_NEW/model.ckpt-20 \
   $BERT_BASE_DIR/bert_config.json \
   $BERT_BASE_DIR_NEW/pytorch_model.bin
+
+cp $BERT_BASE_DIR/bert_config.json $BERT_BASE_DIR_NEW/
+cp $BERT_BASE_DIR/vocab.txt $BERT_BASE_DIR_NEW/
 
 # pytorch_pretrained_bert convert_tf_checkpoint_to_pytorch \
 #   $BERT_BASE_DIR/bert_model.ckpt \
