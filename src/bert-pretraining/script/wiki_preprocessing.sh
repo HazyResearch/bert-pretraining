@@ -19,7 +19,7 @@ pushed ../
 git clone https://github.com/attardi/wikiextractor.git
 pushed wikiextractor
 git checkout 3162bb6
-popd
+popd 
 popd
 
 echo "start extracting"
