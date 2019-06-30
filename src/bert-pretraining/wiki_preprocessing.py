@@ -147,6 +147,7 @@ if __name__ == "__main__":
 				args=(raw_file, proc_file, subset_ids))
 			mprocs.append(mproc)
 			mproc.start()
+			# launch 100 process every time
 			if i % 100 == 99 or i == len(raw_files) - 1:
 				for mproc in mprocs:
 					mproc.join()
@@ -156,4 +157,30 @@ if __name__ == "__main__":
 	# f_in_name = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki17/wiki_json/AA/wiki_01"
 	# f_out_name = "/dfs/scratch0/zjian/bert-pretraining/data/wiki/wiki17/wiki_json/AA/sent_wiki_01"
 	# proc_raw_data_file(f_in_name, f_out_name, wiki17_subset_ids)
+
+	# merge all the files into a smaller number of files
+	# for path in [path_wiki17, path_wiki18]:
+	n_subfiles = 100   # number of tf re ord to generate
+	approx_num_articles_total = 0
+	for path in [path_wiki17]:
+		proc_files = glob(path+'/*/wiki_*_sent')
+		proc_files = sorted(proc_files)
+		n_proc_file_per_subfiles = math.ceil(len(proc_files) / n_subfiles)
+		f_out = None
+		for i, proc_file in enumerate(proc_files):
+			if i % n_proc_file_per_subfiles == 0:
+				full_file = path.replace("wiki_json", 'wiki_txt/wiki_bert_{}.txt'.format(i // n_proc_file_per_subfiles))
+				if f_out is not None:
+					f_out.close()
+				f_out = open(full_file, 'w')
+			f_in = open(proc_file, 'r')
+			data = f_in.read()
+			f_in.close()
+
+			f_in = open(proc_file, 'r')
+			approx_num_articles = len([x for x in f_in.readlines() if x == '\n'])
+			approx_num_articles_total += approx_num_articles
+			f_in.close()
+			print(i, len(proc_files), n_proc_file_per_subfiles, full_file, approx_num_articles_total, approx_num_articles)
+			f_out.write(data)
 
