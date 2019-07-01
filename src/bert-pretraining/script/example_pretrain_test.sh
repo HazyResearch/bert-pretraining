@@ -7,9 +7,10 @@
 
 export BERT_BASE_DIR=../../../data/bert/uncased_L-12_H-768_A-12
 
+# generate training set
 python ../third_party/bert/create_pretraining_data.py \
   --input_file=../third_party/bert/sample_text.txt \
-  --output_file=/tmp/tf_examples.tfrecord \
+  --output_file=/tmp/tf_examples_train.tfrecord \
   --vocab_file=$BERT_BASE_DIR/vocab.txt \
   --do_lower_case=True \
   --max_seq_length=128 \
@@ -18,9 +19,22 @@ python ../third_party/bert/create_pretraining_data.py \
   --random_seed=12345 \
   --dupe_factor=5
 
+# generate test set
+python ../third_party/bert/create_pretraining_data.py \
+  --input_file=../third_party/bert/sample_text.txt \
+  --output_file=/tmp/tf_examples_test.tfrecord \
+  --vocab_file=$BERT_BASE_DIR/vocab.txt \
+  --do_lower_case=True \
+  --max_seq_length=128 \
+  --max_predictions_per_seq=20 \
+  --masked_lm_prob=0.15 \
+  --random_seed=123 \
+  --dupe_factor=5
+
 python ../third_party/bert/run_pretraining.py \
-  --input_file=/tmp/tf_examples.tfrecord \
-  --output_dir=/tmp/pretraining_output_int \
+  --input_file=/tmp/tf_examples_train.tfrecord \
+  --test_input_file=/tmp/tf_examples_test.tfrecord \
+  --output_dir=/tmp/pretraining_output \
   --do_train=True \
   --do_eval=True \
   --bert_config_file=$BERT_BASE_DIR/bert_config.json \
@@ -32,14 +46,14 @@ python ../third_party/bert/run_pretraining.py \
   --learning_rate=2e-5 
   # --init_checkpoint=$BERT_BASE_DIR/bert_model.ckpt
 
-export BERT_BASE_DIR_NEW=/tmp/pretraining_output_int
+export BERT_BASE_DIR_NEW=/tmp/pretraining_output
 pytorch_pretrained_bert convert_tf_checkpoint_to_pytorch \
   $BERT_BASE_DIR_NEW/model.ckpt-20 \
   $BERT_BASE_DIR/bert_config.json \
   $BERT_BASE_DIR_NEW/pytorch_model.bin
 
-cp $BERT_BASE_DIR/bert_config.json $BERT_BASE_DIR_NEW/
-cp $BERT_BASE_DIR/vocab.txt $BERT_BASE_DIR_NEW/
+# cp $BERT_BASE_DIR/bert_config.json $BERT_BASE_DIR_NEW/
+# cp $BERT_BASE_DIR/vocab.txt $BERT_BASE_DIR_NEW/
 
 # pytorch_pretrained_bert convert_tf_checkpoint_to_pytorch \
 #   $BERT_BASE_DIR/bert_model.ckpt \
