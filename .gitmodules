@@ -5,3 +5,4 @@
 [submodule "src/bert-pretraining/third_party/bert"]
 	path = src/bert-pretraining/third_party/bert
 	url = https://github.com/JianGoForIt/bert.git
+	branch = ab8f6b0
