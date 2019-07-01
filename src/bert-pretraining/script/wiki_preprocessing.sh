@@ -62,9 +62,10 @@ popd
 pushd ..
 mkdir -p ../../data/wiki/wiki17/wiki_txt
 mkdir -p ../../data/wiki/wiki18/wiki_txt
-python wiki_preprocessing.py ../../data/wiki/wiki17/wiki_json ../../data/wiki/wiki18/wiki_json 1
+python wiki_preprocessing.py ../../data/wiki/wiki17/wiki_json ../../data/wiki/wiki18/wiki_json 10
 popd
 
+# we switched to generate tf record on google cloud
 # switch to google cloud to generate tf record
 # # generate tensorflow tf record module from bert format txt file
 # pushd ../third_party/bert
