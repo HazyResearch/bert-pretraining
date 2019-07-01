@@ -20,7 +20,7 @@ def bert_pretraining_lr_tuning_training():
             --num_warmup_steps=2500 \
             --learning_rate={} \
             --use_tpu=True \
-            --tpu_name=demo-tpu-{} 2>&1 | tee pretrain_tuning_lr_{}.log &')
+            --tpu_name=tpu-{} 2>&1 | tee pretrain_tuning_lr_{}.log &')
     with open(file_name, 'w') as f:
         for i, lr in enumerate(lrs):
             cmd_str = tpu_tmp.format(i, i)
@@ -30,3 +30,5 @@ def bert_pretraining_lr_tuning_training():
     
 if __name__ == "__main__":
     bert_pretraining_lr_tuning_training()
+
+
