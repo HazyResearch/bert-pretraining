@@ -34,7 +34,7 @@ python ../third_party/bert/create_pretraining_data.py \
 
 python ../third_party/bert/run_pretraining.py \
  --input_file=gs://embeddings-data/tf_examples_train.tfrecord \
- --input_file=gs://embeddings-data/tf_examples_test.tfrecord \
+ --test_input_file=gs://embeddings-data/tf_examples_test.tfrecord \
  --output_dir=gs://embeddings-ckpt/pipeline-test  \
  --do_train=True \
  --do_eval=True \
