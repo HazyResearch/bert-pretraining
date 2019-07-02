@@ -123,8 +123,8 @@ def bert_pretraining_3_seeds_different_size():
         for name in ['wiki17', 'wiki18']:
             for seed in [1,2,3]:
                 for dim in dims:
-                    cmd = "gsutil cp output/pretrain_seed_{}_dim_{}_{}.log gs://embeddigs-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}_{} \n".format(seed, dim, name, seed, dim, name)
-            f.write(cmd)
+                    cmd = "gsutil cp output/pretrain_seed_{}_dim_{}_{}.log gs://embeddings-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}_{} \n".format(seed, dim, name, seed, dim, name)
+                    f.write(cmd)
         print("cmd saved in ", file_name)
     
     
