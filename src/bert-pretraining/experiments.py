@@ -66,7 +66,7 @@ def bert_pretraining_3_seeds_different_size():
                         line = line.replace("768", str(dim))
                     f_out.write(line)
 
-    run_tmp = ('python ./third_party/bert/run_pretraining.py \
+    run_tmp = ('python ./third_party/bert/run_pretraining.py --rand_seed={} \
             --input_file=gs://embeddings-data2/bert-wiki/{}/wiki_tf_rec/part_tf_examples_*.tfrecord \
             --output_dir=gs://embeddings-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}_{}  \
             --do_train=True \
@@ -87,27 +87,27 @@ def bert_pretraining_3_seeds_different_size():
             print("cmd saved in ", file_name)
             with open(file_name, "w") as f:
                 dim = 192
-                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                cmd = run_tmp.format(seed, name, seed, dim, name, dim, tpu_id, seed, dim, name)
                 f.write(cmd)
                 dim = 384
-                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                cmd = run_tmp.format(seed, name, seed, dim, name, dim, tpu_id, seed, dim, name)
                 f.write(cmd)
                 dim = 768
-                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                cmd = run_tmp.format(seed, name, seed, dim, name, dim, tpu_id, seed, dim, name)
                 f.write(cmd)
             tpu_id += 1
             file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
             print("cmd saved in ", file_name)
             with open(file_name, "w") as f:
                 dim = 1536
-                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                cmd = run_tmp.format(seed, name, seed, dim, name, dim, tpu_id, seed, dim, name)
                 f.write(cmd)
             tpu_id += 1
             file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
             print("cmd saved in ", file_name)
             with open(file_name, "w") as f:
                 dim = 3072
-                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                cmd = run_tmp.format(seed, name, seed, dim, name, dim, tpu_id, seed, dim, name)
                 f.write(cmd)
             tpu_id += 1
     # for launch tpu machines
