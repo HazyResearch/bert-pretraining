@@ -57,7 +57,8 @@ def bert_pretraining_lr_tuning_evaluation():
 def bert_pretraining_3_seeds_different_size():
     # the optimial learning rate from grid search using 768 dimension is 0.0001
     # generate script to launch tpu
-    for dim in [192, 384, 768, 1536, 3072]:
+    dims = [192, 384, 768, 1536, 3072]
+    for dim in dims:
         with open("../../data/bert/3_layer_dim_{}_bert_config.json".format(dim), "w") as f_out:
             with open("../../data/bert/3_layer_bert_config.json", "r") as f_in:
                 for line in f_in.readlines():
@@ -109,10 +110,20 @@ def bert_pretraining_3_seeds_different_size():
                 cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
                 f.write(cmd)
             tpu_id += 1
+    # for launch tpu machines
     file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_launch"
     with open(file_name, "w") as f:
         for i in range(tpu_id):
             cmd = "gcloud compute tpus create tpu-{} --range=10.240.{}.0 --version=1.13  --accelerator-type=v2-8 --network=default & \n".format(i, i)
+            f.write(cmd)
+        print("cmd saved in ", file_name)
+    # for copy logs into folders
+    file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_copy_logs"
+    with open(file_name, "w") as f:
+        for name in ['wiki17', 'wiki18']:
+            for seed in [1,2,3]:
+                for dim in dims:
+                    cmd = "gsutil cp output/pretrain_seed_{}_dim_{}_{}.log gs://embeddigs-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}_{} \n".format(seed, dim, name, seed, dim, name)
             f.write(cmd)
         print("cmd saved in ", file_name)
     
