@@ -56,17 +56,18 @@ def bert_pretraining_lr_tuning_evaluation():
 
 def bert_pretraining_3_seeds_different_size():
     # the optimial learning rate from grid search using 768 dimension is 0.0001
+    # generate script to launch tpu
     for dim in [192, 384, 768, 1536, 3072]:
         with open("../../data/bert/3_layer_dim_{}_bert_config.json".format(dim), "w") as f_out:
             with open("../../data/bert/3_layer_bert_config.json", "r") as f_in:
                 for line in f_in.readlines():
                     if "hidden_size" in line:
                         line = line.replace("768", str(dim))
-                    f_out.wirte(line)
+                    f_out.write(line)
 
     run_tmp = ('python ./third_party/bert/run_pretraining.py \
-            --input_file=gs://embeddings-data2/bert-wiki/wiki17/wiki_tf_rec/part_tf_examples_*.tfrecord \
-            --output_dir=gs://embeddings-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}  \
+            --input_file=gs://embeddings-data2/bert-wiki/{}/wiki_tf_rec/part_tf_examples_*.tfrecord \
+            --output_dir=gs://embeddings-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}_{}  \
             --do_train=True \
             --do_eval=True \
             --bert_config_file=../../data/bert/3_layer_dim_{}_bert_config.json \
@@ -77,39 +78,44 @@ def bert_pretraining_3_seeds_different_size():
             --num_warmup_steps=2500 \
             --learning_rate=0.0001 \
             --use_tpu=True \
-            --tpu_name=tpu-{} 2>&1 | tee output/pretrain_seed_{}_dim_{}.log')
+            --tpu_name=tpu-{} 2>&1 | tee output/pretrain_seed_{}_dim_{}_{}.log \n')
+    tpu_id = 0
+    for name in ['wiki17', 'wiki18']:
+        for seed in [1,2,3]:
+            file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
+            print("cmd saved in ", file_name)
+            with open(file_name, "w") as f:
+                dim = 192
+                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                f.write(cmd)
+                dim = 384
+                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                f.write(cmd)
+                dim = 768
+                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                f.write(cmd)
+            tpu_id += 1
+            file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
+            print("cmd saved in ", file_name)
+            with open(file_name, "w") as f:
+                dim = 1536
+                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                f.write(cmd)
+            tpu_id += 1
+            file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
+            print("cmd saved in ", file_name)
+            with open(file_name, "w") as f:
+                dim = 3072
+                cmd = run_tmp.format(name, seed, dim, name, dim, tpu_id, seed, dim, name)
+                f.write(cmd)
+            tpu_id += 1
+    file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_launch"
+    with open(file_name, "w") as f:
+        for i in range(tpu_id):
+            cmd = "gcloud compute tpus create tpu-{} --range=10.240.{}.0 --version=1.13  --accelerator-type=v2-8 --network=default & \n".format(i, i)
+            f.write(cmd)
+        print("cmd saved in ", file_name)
     
-    for seed in [0,1,2]:
-        tpu_id = seed * 3
-        file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
-        print("cmd saved in ", filename)
-        with open(file_name, "w") as f:
-            dim = 192
-            cmd = run_tmp.format(seed, dim, dim, tpu_id, seed, dim)
-            f.write(cmd)
-            dim = 384
-            cmd = run_tmp.format(seed, dim, dim, tpu_id, seed, dim)
-            f.write(cmd)
-            dim = 768
-            cmd = run_tmp.format(seed, dim, dim, tpu_id, seed, dim)
-            f.write(cmd)
-        tpu_id += 1
-        file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
-        print("cmd saved in ", filename)
-        with open(file_name, "w") as f:
-            dim = 1536
-            cmd = run_tmp.format(seed, dim, dim, tpu_id, seed, dim)
-            f.write(cmd)
-        tpu_id += 1
-        file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_tpu_{}".format(tpu_id)
-        print("cmd saved in ", filename)
-        with open(file_name, "w") as f:
-            dim = 3072
-            cmd = run_tmp.format(seed, dim, dim, tpu_id, seed, dim)
-            f.write(cmd)
-
-
-
     
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()
