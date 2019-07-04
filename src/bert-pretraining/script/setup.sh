@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # need make sure conda is installed already
-conda create -n bert-pretraining python=3.6
+# conda create -n bert-pretraining python=3.6
 
 # We use TPU with tensorflow 1.13.1 for pretraining
 # the TPU comes with it

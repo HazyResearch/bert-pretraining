@@ -1,4 +1,5 @@
 import json
+import glob
 
 SCRIPT_FOLDER="../../script"
 
@@ -136,6 +137,23 @@ def bert_pretraining_3_seeds_different_size():
                     cmd = cmd_tmp.format(dim, seed, dim, name)
                     f.write(cmd + "\n")
         print("cmd saved in ", file_name)
+    file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_download_bucket"
+    # for downloading to local disk
+    cmd_tmp = ("gsutil cp -r gs://embeddings-ckpt/bert_pretraining_3_seeds/* \
+                ../../results/bert_ckpt/")
+    # generate bert pytorch ckpt
+    file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_trans_to_pytorch"
+    folders = glob.glob("../../results/bert_ckpt/*")
+    cmd_tmp = ('pytorch_pretrained_bert convert_tf_checkpoint_to_pytorch '
+                '{}/model.ckpt-250000 '
+                '{}/bert_config.json '
+                '{}/pytorch_model.bin')
+    with open(file_name, "w") as f:
+        for folder in folders:
+            cmd = cmd_tmp.format(folder, folder, folder)
+            f.write(cmd + "\n")
+        print("cmd saved in ", file_name)
+
 
     
 if __name__ == "__main__":
