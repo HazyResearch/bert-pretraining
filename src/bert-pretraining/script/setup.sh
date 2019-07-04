@@ -15,4 +15,9 @@ popd
 pip install -U spacy
 python -m spacy download en
 
+# install smallfry
+pushed ../third_party/smallfry
+pip install -e .
+popd
+
 source deactivate
