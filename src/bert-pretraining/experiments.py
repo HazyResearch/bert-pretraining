@@ -126,7 +126,17 @@ def bert_pretraining_3_seeds_different_size():
                     cmd = "gsutil cp output/pretrain_seed_{}_dim_{}_{}.log gs://embeddings-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}_{} \n".format(seed, dim, name, seed, dim, name)
                     f.write(cmd)
         print("cmd saved in ", file_name)
-    
+    file_name = SCRIPT_FOLDER + "/0701_bert_pretraining_all_seed_copy_configs"
+    cmd_tmp = ("gsutil cp ../../data/bert/3_layer_dim_{}_bert_config.json \
+                gs://embeddings-ckpt/bert_pretraining_3_seeds/pretrain_seed_{}_dim_{}_{}/bert_config.json")
+    with open(file_name, "w") as f:
+        for name in ['wiki17', 'wiki18']:
+            for seed in [1,2,3]:
+                for dim in dims:
+                    cmd = cmd_tmp.format(dim, seed, dim, name)
+                    f.write(cmd + "\n")
+        print("cmd saved in ", file_name)
+
     
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()
