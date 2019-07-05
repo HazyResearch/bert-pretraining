@@ -166,7 +166,7 @@ def get_sentiment_data_path():
 
 def generate_all_sentiment_features_dimensionality():
     ckpt_folders = glob.glob("../../results/bert_ckpt/*")
-    datasets = ['mr', 'sst2', 'subj', 'mpqa']
+    datasets = ['mr', 'sst', 'subj', 'mpqa']
     nbits = [32]
     exp_name = "dimensionality"
     data_path = get_sentiment_data_path()
