@@ -5,7 +5,8 @@
 
 # We use TPU with tensorflow 1.13.1 for pretraining
 # the TPU comes with it
-source activate bert-pretraining
+# pip install tensorflow==1.13.1
+#conda activate bert-pretraining
 
 pushd ../third_party/pytorch-pretrained-BERT
 pip install -e .
@@ -20,4 +21,4 @@ pushed ../third_party/smallfry
 pip install -e .
 popd
 
-source deactivate
+#source deactivate

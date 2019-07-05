@@ -1,8 +1,10 @@
-import glob
+from glob import glob
+import sys, os
+import pathlib
 
 def print_folder_containing_files(contains=False, root_folder='./', file_regex="*final.json"):
     # we use this function to search for folders not containing a file with substr in its name
-    paths = glob(root + "/*")
+    paths = glob(root_folder + "/*")
     print("total subdir ", len(paths))
     for dir in paths:
         regex = str(pathlib.PurePath(root_folder, dir, file_regex))
