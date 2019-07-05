@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import sys
+import datetime
 
 def set_tensorflow_random_seed(rand_seed):
     random.seed(rand_seed)
