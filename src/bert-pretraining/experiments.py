@@ -1,5 +1,6 @@
 import json
 import glob
+import utils
 
 SCRIPT_FOLDER="../../script"
 
@@ -154,9 +155,57 @@ def bert_pretraining_3_seeds_different_size():
             f.write(cmd + "\n")
         print("cmd saved in ", file_name)
 
+def get_feature_path(exp_name, dataset, ckpt_folder, nbit=32):
+    exp_path = "../../results/features/{}_{}".format(exp_name, utils.get_date_str())
+    ckpt_name = ckpt_folder.split("/")[-1]
+    folder = exp_path + "/{}/nbit_{}/{}".format(dataset, nbit, ckpt_name)
+    return folder
+
+def get_sentiment_data_path():
+    return "./third_party/sentence_classification/data"
+
+def generate_all_sentiment_features_dimensionality():
+    ckpt_folders = glob.glob("../../results/bert_ckpt/*")
+    datasets = ['mr', 'sst2', 'subj', 'mpqa']
+    nbits = [32]
+    exp_name = "dimensionality"
+    data_path = get_sentiment_data_path()
+    script_name = SCRIPT_FOLDER + "/0703_generate_features_for_dimensionality_copy_vocab_file"
+    # copy the vocab files to the ckpt folders
+    with open(script_name, "w") as f:
+        cmd_tmp = "cp ../../data/bert/vocab.txt {}/"
+        for ckpt_path in ckpt_folders:
+            cmd = cmd_tmp.format(ckpt_path)
+            f.write(cmd + "\n")
+    print("cmd saved in ", script_name)
+
+    # generate the cmd to generate features
+    script_name = SCRIPT_FOLDER + "/0703_generate_features_for_dimensionality"
+    with open(script_name, "w") as f:
+        cmd_tmp = ('python ./third_party/pytorch-pretrained-BERT/examples/extract_features.py '
+                        '--input_file {} '
+                        '--output_file {} '
+                        '--bert_model {} '
+                        '--do_lower_case '
+                        '--layer 2 '
+                        '--max_seq_length 128 '
+                        '--for_sentiment')
+        for ckpt_path in ckpt_folders:
+            for dataset in datasets:
+                for nbit in nbits:
+                    output_path = get_feature_path(exp_name, 
+                        dataset=dataset, ckpt_folder=ckpt_path, nbit=nbit)
+                    for part in ['train', 'test', 'heldout']:
+                        input_file = data_path + "/{}.{}.txt".format(dataset, part)
+                        output_file = output_path + "/{}.{}.feature.npy".format(dataset, part)
+                        cmd = cmd_tmp.format(input_file, output_file, ckpt_path)
+                        f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
+
 
     
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()
     # bert_pretraining_lr_tuning_evaluation()
-    bert_pretraining_3_seeds_different_size()
+    # bert_pretraining_3_seeds_different_size()
+    generate_all_sentiment_features_dimensionality()
