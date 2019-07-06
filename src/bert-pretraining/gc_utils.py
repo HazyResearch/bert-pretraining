@@ -7,7 +7,7 @@ def print_folder_containing_files(contains=False, root_folder='./', file_regex="
     paths = glob(root_folder + "/*")
     print("total subdir ", len(paths))
     for dir in paths:
-        regex = str(pathlib.PurePath(root_folder, dir, file_regex))
+        regex = str(pathlib.PurePath(dir, file_regex))
         if len(glob(regex)) == 0 and contains == False:
             print(dir)
         if len(glob(regex)) != 0 and contains == True:
