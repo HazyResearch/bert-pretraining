@@ -228,7 +228,7 @@ def generate_all_sentiment_features_pytorch_file():
                         dataset=dataset, ckpt_folder=ckpt_path, nbit=nbit)
                     for part in ['train', 'test', 'heldout']:
                         input_file = data_path + "/{}.{}.txt".format(dataset, part)
-                        output_file = output_path + "/{}.{}.feature.pt".format(dataset, part)
+                        output_file = output_path + "/{}.{}.feature.npz".format(dataset, part)
                         cmd = cmd_tmp.format(input_file, output_file, ckpt_path)
                         f.write(cmd + "\n")
         print("cmd saved in ", script_name)
