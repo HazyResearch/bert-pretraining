@@ -12,3 +12,4 @@
 [submodule "src/bert-pretraining/third_party/sentence_classification"]
 	path = src/bert-pretraining/third_party/sentence_classification
 	url = https://github.com/avnermay/sentence_classification.git
+	branch = bert-feat-extractor
