@@ -204,34 +204,35 @@ def generate_all_sentiment_features_dimensionality():
         print("cmd saved in ", script_name)
 
 def generate_all_sentiment_features_pytorch_file():
-    ckpt_folders = glob.glob("../../results/bert_ckpt/*")
-    # generate the cmd to generate features
-    datasets = ['mr', 'subj', 'mpqa', 'sst']
-    nbits = [32]
-    exp_name = "dimensionality"
-    data_path = get_sentiment_data_path()
-    script_name = SCRIPT_FOLDER + "/0706_generate_features_for_dimensionality_pytorch"
-    with open(script_name, "w") as f:
-        cmd_tmp = ('python ./third_party/pytorch-pretrained-BERT/examples/extract_features.py '
-                        '--input_file {} '
-                        '--output_file {} '
-                        '--bert_model {} '
-                        '--do_lower_case '
-                        '--layer 2 '
-                        '--max_seq_length 128 '
-                        '--for_sentiment '
-                        '--no_cuda')
-        for ckpt_path in ckpt_folders:
-            for dataset in datasets:
-                for nbit in nbits:
-                    output_path = get_feature_path(exp_name, 
-                        dataset=dataset, ckpt_folder=ckpt_path, nbit=nbit)
-                    for part in ['train', 'test', 'heldout']:
-                        input_file = data_path + "/{}.{}.txt".format(dataset, part)
-                        output_file = output_path + "/{}.{}.feature.npz".format(dataset, part)
-                        cmd = cmd_tmp.format(input_file, output_file, ckpt_path)
-                        f.write(cmd + "\n")
-        print("cmd saved in ", script_name)
+    for corpus in ['wiki17', 'wiki18']:
+        ckpt_folders = glob.glob("../../results/bert_ckpt/*{}".format(corpus))
+        # generate the cmd to generate features
+        datasets = ['mr', 'subj', 'mpqa', 'sst']
+        nbits = [32]
+        exp_name = "dimensionality"
+        data_path = get_sentiment_data_path()
+        script_name = SCRIPT_FOLDER + "/0706_generate_features_for_dimensionality_pytorch_{}".format(corpus)
+        with open(script_name, "w") as f:
+            cmd_tmp = ('python ./third_party/pytorch-pretrained-BERT/examples/extract_features.py '
+                            '--input_file {} '
+                            '--output_file {} '
+                            '--bert_model {} '
+                            '--do_lower_case '
+                            '--layer 2 '
+                            '--max_seq_length 128 '
+                            '--for_sentiment '
+                            '--no_cuda')
+            for ckpt_path in ckpt_folders:
+                for dataset in datasets:
+                    for nbit in nbits:
+                        output_path = get_feature_path(exp_name, 
+                            dataset=dataset, ckpt_folder=ckpt_path, nbit=nbit)
+                        for part in ['train', 'test', 'heldout']:
+                            input_file = data_path + "/{}.{}.txt".format(dataset, part)
+                            output_file = output_path + "/{}.{}.feature.npz".format(dataset, part)
+                            cmd = cmd_tmp.format(input_file, output_file, ckpt_path)
+                            f.write(cmd + "\n")
+            print("cmd saved in ", script_name)
 
 
 
