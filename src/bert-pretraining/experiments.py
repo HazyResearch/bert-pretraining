@@ -208,7 +208,7 @@ def generate_all_sentiment_features_pytorch_file():
     #    ckpt_folders = glob.glob("../../results/bert_ckpt/*{}".format(corpus))
         # generate the cmd to generate features
     ckpt_folders = glob.glob("../../results/bert_ckpt/*")
-    datasets = ['mr', 'subj', 'mpqa']
+    datasets = ['mr', 'subj', 'mpqa', 'sst']
     nbits = [32]
     exp_name = "dimensionality"
     data_path = get_sentiment_data_path()
