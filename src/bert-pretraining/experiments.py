@@ -326,7 +326,7 @@ def generate_all_predictions_for_linear_bert_sentiment():
                     cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
                     f.write(cmd + "\n")
         print("cmd saved in ", script_name)
-
+    
     
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()
@@ -335,5 +335,6 @@ if __name__ == "__main__":
     # generate_all_sentiment_features_dimensionality()
     # generate_all_sentiment_features_pytorch_file()
     # tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
-    #get_best_lr_for_linear_bert_sentiment()
+    # get_best_lr_for_linear_bert_sentiment()
     generate_all_predictions_for_linear_bert_sentiment()
+

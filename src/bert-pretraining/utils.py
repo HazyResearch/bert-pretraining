@@ -98,3 +98,30 @@ def stats_on_subset_json(results, key):
     for res in results:
         res_list.append(res[key])
     return np.mean(res_list), np.std(res_list)
+
+def clean_json_results(results):
+    results_clean = []
+    for result in results:
+        # for feature to prediction experiments
+        if "feat_input_folder" in result.keys():
+            if "wiki17" in result["feat_input_folder"]:
+                result["corpus"] == "wiki17"
+            if "wiki18" in result["feat_input_folder"]:
+                result["corpus"] == "wiki18"
+        results_clean.append(result)
+    return results_clean
+
+
+def gather_json_results(json_regex):
+    # all_json_regex = "../../results/predictions/dimensionality_2019-07-07/{}/nbit_32/*/final_results.json".format(dataset)
+    results = gather_results(json_regex)
+    results = [flatten_dict(result) for result in results]
+    return results
+
+def get_classification_disagreement(pred1, pred2):
+    assert isinstance(pred1, list)
+    assert isinstance(pred2, list)
+    compare = np.array(pred1) != np.array(pred2)
+    disagreement = float(np.sum(compare)) / float(len(pred1))
+    return disagreement
+
