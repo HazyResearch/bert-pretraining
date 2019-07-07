@@ -1,7 +1,20 @@
+import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
 import csv
 import os, sys
+
+def std_results_array(results_array):
+    # average list of 1d np array results
+    results_array = [np.reshape(x, x.size) for x in results_array]
+    results = np.vstack(results_array)
+    return np.std(results, axis=0)
+
+def average_results_array(results_array):
+    # average list of 1d np array results
+    results_array = [np.reshape(x, x.size) for x in results_array]
+    results = np.vstack(results_array)
+    return np.mean(results, axis=0)
 
 def save_csv_with_error_bar(data_list, file_name="./test/test.csv", ave_x=False):
     '''

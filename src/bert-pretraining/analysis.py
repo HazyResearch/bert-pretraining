@@ -28,8 +28,8 @@ def get_wiki17_wiki18_pred_disagreement_vs_dim(results, dims=[192, 384, 768, 153
             disagreements.append(utils.get_classification_disagreement(wiki17_pred, wiki18_pred))
         disagreements_all_dim.append(disagreements)
         print("dim ", dim, "disagr. ave / std: ", np.mean(disagreements), np.std(disagreements))
-    disagr = np.array(disagreements_all_dim)
-    data_list = ['Disagreement', ndims, [disagr[i, :] for i in range(len(seeds))]]
+    disagr = np.array(disagreements_all_dim).T
+    data_list = [['Disagreement', dims, [disagr[i, :] for i in range(len(seeds))]]]
     return data_list
 
 def print_all_stab_vs_dim_for_linear_bert_sentiment():
@@ -44,8 +44,9 @@ def print_all_stab_vs_dim_for_linear_bert_sentiment():
             results = utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results) == 30, json_regex
             print("\n\n", dataset)
-            data_list = print_wiki17_wiki18_pred_disagreement_vs_dim(results)
-            csv_name = get_csv_folder + "/stab_vs_dim_{}_lr_dataset_{}.csv"
+            data_list = get_wiki17_wiki18_pred_disagreement_vs_dim(results)
+            print(data_list)
+            csv_name = utils.get_csv_folder() + "/stab_vs_dim_{}_lr_dataset_{}.csv".format(exp_name, dataset)
             save_csv_with_error_bar(data_list, csv_name)
 
 if __name__ == "__main__":

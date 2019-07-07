@@ -22,5 +22,5 @@ pip install -e .
 popd
 
 pip install matplotlib
-
+pip install pandas
 #source deactivate
