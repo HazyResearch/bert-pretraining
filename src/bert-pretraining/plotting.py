@@ -6,13 +6,19 @@ import matplotlib.pyplot as plt
 import plot_utils
 
 def plot_all_bert_stab_vs_dim():
-	all_csv = glob.glob("./output/*stab_vs_dim*.csv")
+	all_csv = glob.glob("./output/csv/stab_vs_dim*.csv")
 	for csv_name in all_csv:
 		groups, names, data = plot_utils.csv_to_table(csv_name)
 		plt.figure()
-		plot_figure_with_error_bar(names, data, color_list="b")
+		plot_utils.plot_figure_with_error_bar(names, data, color_list="b")
 		# replace suffix and folder for pdf
-		plt.save_fig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
+		print(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
+		plt.title(csv_name.split("dataset_")[1].split(".")[0])
+		plt.ylabel("Disagreement %")
+		plt.xlabel("Dimentionality")
+		plt.xscale("log")
+		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
+		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"))
 		plt.close()
 
 if __name__ == "__main__":
