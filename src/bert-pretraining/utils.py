@@ -105,9 +105,9 @@ def clean_json_results(results):
         # for feature to prediction experiments
         if "feat_input_folder" in result.keys():
             if "wiki17" in result["feat_input_folder"]:
-                result["corpus"] == "wiki17"
+                result["corpus"] = "wiki17"
             if "wiki18" in result["feat_input_folder"]:
-                result["corpus"] == "wiki18"
+                result["corpus"] = "wiki18"
         results_clean.append(result)
     return results_clean
 
