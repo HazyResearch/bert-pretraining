@@ -341,7 +341,7 @@ def tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model():
         '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
         '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
         '--lstm --feat_input --feat_input_folder {} --feat_dim {} '
-        '--dataset {} --out {} --model_seed {} --lr {} -d 768 \\"')
+        '--dataset {} --out {} --model_seed {} --lr {} --d 768 \\"')
     with open(script_name, "w") as f:
         for dataset in datasets:
             for lr in lrs:
