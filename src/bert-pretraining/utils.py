@@ -5,6 +5,7 @@ import datetime
 import logging
 import pathlib
 import json
+import glob
 
 def set_tensorflow_random_seed(rand_seed):
     random.seed(rand_seed)
@@ -57,11 +58,14 @@ def get_arg_str(parser, args):
         if key not in to_skip:
             runname += '{},{}_'.format(key,val)
 
+def load_from_json(path):
+    with open(path) as f: return json.load(f)
+
 def gather_results(path_regex):
     file_list = glob.glob(path_regex) 
     #for x in file_list:
     #    print(x)
-    return [utils.load_from_json(f) for f in file_list]
+    return [load_from_json(f) for f in file_list]
 
 def flatten_dict(to_flatten):
     flattened = {}
