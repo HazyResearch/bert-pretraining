@@ -2,10 +2,13 @@ import sys, os
 import glob
 import json
 
+import csv
 import numpy as np
 import utils
+from plot_utils import save_csv_with_error_bar
 
-def print_wiki17_wiki18_pred_disagreement_vs_dim(results, dims=[192, 384, 768, 1536, 3072], seeds=[1,2,3]):
+def get_wiki17_wiki18_pred_disagreement_vs_dim(results, dims=[192, 384, 768, 1536, 3072], seeds=[1,2,3]):
+    disagreements_all_dim = []
     for dim in dims:
         disagreements = []
         for seed in seeds:
@@ -23,9 +26,13 @@ def print_wiki17_wiki18_pred_disagreement_vs_dim(results, dims=[192, 384, 768, 1
             assert len(subset) == 1
             wiki18_pred = subset[0]["test_pred"]
             disagreements.append(utils.get_classification_disagreement(wiki17_pred, wiki18_pred))
+        disagreements_all_dim.append(disagreements)
         print("dim ", dim, "disagr. ave / std: ", np.mean(disagreements), np.std(disagreements))
+    disagr = np.array(disagreements_all_dim)
+    data_list = ['Disagreement', ndims, [disagr[i, :] for i in range(len(seeds))]]
+    return data_list
 
-def generate_all_predictions_for_linear_bert_sentiment():
+def print_all_stab_vs_dim_for_linear_bert_sentiment():
     datasets = ['mr', 'subj', 'mpqa', 'sst']
     nbit = 32   
     exp_names = ['default', 'opt'] 
@@ -37,11 +44,12 @@ def generate_all_predictions_for_linear_bert_sentiment():
             results = utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results) == 30, json_regex
             print("\n\n", dataset)
-            print_wiki17_wiki18_pred_disagreement_vs_dim(results)
-
+            data_list = print_wiki17_wiki18_pred_disagreement_vs_dim(results)
+            csv_name = get_csv_folder + "/stab_vs_dim_{}_lr_dataset_{}.csv"
+            save_csv_with_error_bar(data_list, csv_name)
 
 if __name__ == "__main__":
-    generate_all_predictions_for_linear_bert_sentiment()
+    print_all_stab_vs_dim_for_linear_bert_sentiment()
 
     
 

@@ -21,4 +21,6 @@ pushed ../third_party/smallfry
 pip install -e .
 popd
 
+pip install matplotlib
+
 #source deactivate

@@ -125,3 +125,13 @@ def get_classification_disagreement(pred1, pred2):
     disagreement = float(np.sum(compare)) / float(len(pred1))
     return disagreement
 
+def get_csv_folder(gc=True):
+    if gc:
+        # using google cloud
+        return "/home/zjian/bert-pretraining/src/bert-pretraining/output/csv"
+    else:
+        return "./output/csv"
+
+
+
+
