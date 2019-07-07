@@ -1,6 +1,7 @@
 import json
 import glob
 import utils
+import os
 
 SCRIPT_FOLDER="../../script"
 
@@ -239,7 +240,7 @@ def generate_all_sentiment_features_pytorch_file():
         print("cmd saved in ", script_name)
 
 def get_pred_path_from_feature_path(exp_name, dataset, feat_folder, nbit=32, date_str=None):
-    if data_str is None:
+    if date_str is None:
         exp_path = "../../results/predictions/{}_{}".format(exp_name, utils.get_date_str())
     else:
         exp_path = "../../results/predictions/{}_{}".format(exp_name, data_str)
@@ -255,24 +256,24 @@ def tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model():
     nbit = 32
     lrs = [0.1, 0.01, 0.001, 0.0001, 0.00001]
     exp_name = "dimensionality"
-    cmd_tmp = ('qsub -V -b y -wd /mnt/bert-pretraining/wd '
-        '/mnt/bert-pretraining/src/bert-pretraining/gc_env.sh '
-        '\\"python /mnt/bert-pretraining/src/bert-pretraining/third_party/sentence_classification '
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
         '--la --feat_input --feat_input_folder {} --feat_dim {} '
-        '--dataset {} --out {} --model_seed {} --lr {}\\"\n')
+        '--dataset {} --out {} --model_seed {} --lr {}\\"')
     with open(script_name, "w") as f:
         for dataset in datasets:
             for lr in lrs:
-                feature_folder = glob.glob("../../results/features/dimensionality_2019-07-06/{}/*dim_768*wiki17".format(dataset))
-                print(feature_folder)
-                assert len(feature_folder) == 1
-                feature_folder = feature_folder[0]
-                seed = int(feature_folder.split("seed_")[1].split("_")[0])
-                pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
-                pred_path += "_lr_{}".format(str(lr))
-                feat_dim = int(feature_folder.split("dim_")[1].split("_")[0])
-                cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
-                f.write(cmd + "\n")
+                feature_folders = glob.glob("../../results/features/dimensionality_2019-07-06/{}/nbit_32/*dim_768*wiki17".format(dataset))
+                assert len(feature_folders) == 3 
+                for feature_folder in feature_folders:
+                    feature_folder = os.path.abspath(feature_folder)
+                    seed = int(feature_folder.split("seed_")[1].split("_")[0])
+                    pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
+                    pred_path += "_lr_{}".format(str(lr))
+                    feat_dim = int(feature_folder.split("dim_")[1].split("_")[0])
+                    cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
+                    f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
     
