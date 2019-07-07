@@ -275,6 +275,12 @@ def tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model():
                 f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
+# def get_best_lr_for_linear_bert_sentiment():
+#     datasets = ['mr', 'subj', 'mpqa', 'sst']
+#     for dataset in datasets
+#     all_json = "../../results/predictions/*/*/"
+
+
     
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()

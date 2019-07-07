@@ -56,3 +56,35 @@ def get_arg_str(parser, args):
     for key,val in non_default_args(parser, args):
         if key not in to_skip:
             runname += '{},{}_'.format(key,val)
+
+def gather_results(path_regex):
+    file_list = glob.glob(path_regex) 
+    #for x in file_list:
+    #    print(x)
+    return [utils.load_from_json(f) for f in file_list]
+
+def flatten_dict(to_flatten):
+    flattened = {}
+    for k,v in to_flatten.items():
+        if isinstance(v,dict):
+            for k2,v2 in v.items():
+                flattened[k2] = v2
+        else:
+            flattened[k] = v
+    return flattened
+
+# Returns a list of result dictionaries with the subset of results from
+# all_results which exactly matched the 'key_values_to_match' dictionary.
+def extract_result_subset(all_results, key_values_to_match):
+    subset = []
+    for result in all_results:
+        if matches_all_key_values(result, key_values_to_match):
+            subset.append(result)
+    return subset
+
+# return True if result[key] in values for all key-value pairs in key_values_to_match
+def matches_all_key_values(result, key_values_to_match):
+    for key,values in key_values_to_match.items():
+        assert type(values) == list
+        if (key not in result) or (result[key] not in values): return False
+    return True
