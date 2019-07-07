@@ -249,8 +249,6 @@ def get_pred_path_from_feature_path(exp_name, dataset, feat_folder, nbit=32, dat
     return os.path.abspath(folder)
 
 def tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model():
-    # TODO remember to have the ckpt and feature path in the final results
-    # tune learning rate.
     script_name = SCRIPT_FOLDER + "/0706_generate_prediction_for_dimensionality_lr_tuning"
     datasets = ['mr', 'subj', 'mpqa', 'sst']
     nbit = 32
@@ -276,11 +274,51 @@ def tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model():
                     f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
-# def get_best_lr_for_linear_bert_sentiment():
-#     datasets = ['mr', 'subj', 'mpqa', 'sst']
-#     for dataset in datasets
-#     all_json = "../../results/predictions/*/*/"
+def get_best_lr_for_linear_bert_sentiment():
+    datasets = ['mr', 'subj', 'mpqa', 'sst']
+    lrs = [0.1, 0.01, 0.001, 0.0001, 0.00001]
+    metric = "test_err"
+    best_lr = {}
+    for dataset in datasets:
+        all_json_regex = glob.glob("../../results/predictions/dimensionality_2019-07-07/{}/nbit_32/*/final_results.json".format(dataset))
+        results = gather_results(all_json_regex)
+        results = flatten_dict(results)
+        best_err = 1.0
+        for lr in lrs:
+            keys = {"lr": lr}
+            subset_results = extract_result_subset(results, keys)
+            assert len(subset_results) == 3
+            ave, std = stats_on_subset_json(subset_results, )
+            print(dataset, " lr ", lr, " test err ave/std", ave, std)
+            if ave < best_err:
+                best_lr[dataset] = lr
+    return best_lr
 
+def generate_all_predictions_for_linear_bert_sentiment():
+    best_lr = get_best_lr_for_linear_bert_sentiment()
+    script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds"
+    datasets = ['mr', 'subj', 'mpqa', 'sst']
+    nbit = 32
+    exp_name = "dimensionality"
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
+        '--la --feat_input --feat_input_folder {} --feat_dim {} '
+        '--dataset {} --out {} --model_seed {} --lr {}\\"')
+    with open(script_name, "w") as f:
+        for dataset in datasets:
+            lr = best_lr[dataset]
+            feature_folders = glob.glob("../../results/features/dimensionality_2019-07-06/{}/nbit_32/*".format(dataset))
+            assert len(feature_folders) == 3 
+            for feature_folder in feature_folders:
+                feature_folder = os.path.abspath(feature_folder)
+                seed = int(feature_folder.split("seed_")[1].split("_")[0])
+                pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
+                pred_path += "_lr_{}".format(str(lr))
+                feat_dim = int(feature_folder.split("dim_")[1].split("_")[0])
+                cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
+                f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
 
     
 if __name__ == "__main__":
@@ -289,4 +327,6 @@ if __name__ == "__main__":
     # bert_pretraining_3_seeds_different_size()
     # generate_all_sentiment_features_dimensionality()
     # generate_all_sentiment_features_pytorch_file()
-    tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
+    # tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
+    get_best_lr_for_linear_bert_sentiment()
+    generate_all_predictions_for_linear_bert_sentiment()

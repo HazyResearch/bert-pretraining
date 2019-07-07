@@ -88,3 +88,9 @@ def matches_all_key_values(result, key_values_to_match):
         assert type(values) == list
         if (key not in result) or (result[key] not in values): return False
     return True
+
+def stats_on_subset_json(results, key):
+    res_list = []
+    for res in results:
+        res_list.append(res[key])
+    return np.mean(res_list), np.std(res_list)
