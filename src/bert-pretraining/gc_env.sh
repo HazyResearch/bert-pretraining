@@ -3,11 +3,10 @@
 # NOTE: This only works if called from base conda environment!
 
 # Make sure conda is in path
-ln -s /mnt/home/zjian/anaconda3 /home/zjian/anaconda3
-export PATH=/home/zjian/anaconda3/bin:${PATH}
+export PATH=${PATH}:/home/zjian/anaconda3/bin
 
 # This is necessary for conda activate to work properly
-# . /home/zjian/anaconda3/etc/profile.d/conda.sh
+#. /home/zjian/anaconda3/etc/profile.d/conda.sh
 
 # Activate smallfry env
 printf "conda activate \n"
