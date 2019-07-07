@@ -38,3 +38,21 @@ def init_logging(path):
     formatter = logging.Formatter("%(levelname)s - %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
+def non_default_args(parser, args):
+    non_default = []
+    for action in parser._actions:
+        default = action.default
+        key = action.dest
+        if key in args:
+            val = args[key]
+            if val != default:
+                non_default.append((key,val))
+    assert len(non_default) > 0, 'There must be a non-default arg.'
+    return non_default
+
+def get_arg_str(parser, args):
+    # args needs to be a dict
+    for key,val in non_default_args(parser, args):
+        if key not in to_skip:
+            runname += '{},{}_'.format(key,val)

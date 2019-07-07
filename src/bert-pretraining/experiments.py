@@ -155,8 +155,11 @@ def bert_pretraining_3_seeds_different_size():
             f.write(cmd + "\n")
         print("cmd saved in ", file_name)
 
-def get_feature_path(exp_name, dataset, ckpt_folder, nbit=32):
-    exp_path = "../../results/features/{}_{}".format(exp_name, utils.get_date_str())
+def get_feature_path(exp_name, dataset, ckpt_folder, nbit=32, date_str=None):
+    if data_str is None:
+        exp_path = "../../results/features/{}_{}".format(exp_name, utils.get_date_str())
+    else:
+        exp_path = "../../results/features/{}_{}".format(exp_name, data_str)
     ckpt_name = ckpt_folder.split("/")[-1]
     folder = exp_path + "/{}/nbit_{}/{}".format(dataset, nbit, ckpt_name)
     return folder
@@ -235,7 +238,42 @@ def generate_all_sentiment_features_pytorch_file():
                         f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
+def get_pred_path_from_feature_path(exp_name, dataset, feat_folder, nbit=32, date_str=None):
+    if data_str is None:
+        exp_path = "../../results/predictions/{}_{}".format(exp_name, utils.get_date_str())
+    else:
+        exp_path = "../../results/predictions/{}_{}".format(exp_name, data_str)
+    feat_name = feat_folder.split("/")[-1]
+    folder = exp_path + "/{}/nbit_{}/{}".format(dataset, nbit, feat_name)
+    return os.path.abspath(folder)
 
+def tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model():
+    # TODO remember to have the ckpt and feature path in the final results
+    # tune learning rate.
+    script_name = SCRIPT_FOLDER + "/0706_generate_prediction_for_dimensionality_lr_tuning"
+    datasets = ['mr', 'subj', 'mpqa', 'sst']
+    nbit = 32
+    lrs = [0.1, 0.01, 0.001, 0.0001, 0.00001]
+    exp_name = "dimensionality"
+    cmd_tmp = ('qsub -V -b y -wd /mnt/bert-pretraining/wd '
+        '/mnt/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /mnt/bert-pretraining/src/bert-pretraining/third_party/sentence_classification '
+        '--la --feat_input --feat_input_folder {} --feat_dim {} '
+        '--dataset {} --out {} --model_seed {} --lr {}\\"\n')
+    with open(script_name, "w") as f:
+        for dataset in datasets:
+            for lr in lrs:
+                feature_folder = glob.glob("../../results/features/dimensionality_2019-07-06/{}/*dim_768*wiki17".format(dataset))
+                print(feature_folder)
+                assert len(feature_folder) == 1
+                feature_folder = feature_folder[0]
+                seed = int(feature_folder.split("seed_")[1].split("_")[0])
+                pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
+                pred_path += "_lr_{}".format(str(lr))
+                feat_dim = int(feature_folder.split("dim_")[1].split("_")[0])
+                cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
+                f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
 
     
 if __name__ == "__main__":
@@ -243,4 +281,5 @@ if __name__ == "__main__":
     # bert_pretraining_lr_tuning_evaluation()
     # bert_pretraining_3_seeds_different_size()
     # generate_all_sentiment_features_dimensionality()
-    generate_all_sentiment_features_pytorch_file()
+    # generate_all_sentiment_features_pytorch_file()
+    tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
