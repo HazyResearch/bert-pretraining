@@ -299,8 +299,10 @@ def get_best_lr_for_linear_bert_sentiment():
 
 def generate_all_predictions_for_linear_bert_sentiment():
     best_lr = get_best_lr_for_linear_bert_sentiment()
-    script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds"
-    datasets = ['mr', 'subj', 'mpqa', 'sst']
+    # script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds"
+    # datasets = ['mr', 'subj', 'mpqa', 'sst']
+    script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds_sst_rerun"
+    datasets = ['sst']
     nbit = 32
     exp_names = ["dimensionality_opt_lr_3_seeds", "dimensionality_default_lr_3_seeds"]
     cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
