@@ -46,7 +46,7 @@ def main():
 
     # load the dataset
     feats = read_npy_feature(args.input_file)
-    labels = read_npy_label(args.input_file.replace(".npz", ".npy").replace("feature", "label"))
+    labels = read_npy_label(args.input_file.replace(".feature.npz", ".label.npy"))
 
     # we will directly save if we need 32 bit embeddings
     range_limit = None
@@ -77,7 +77,7 @@ def main():
     out_file_name = os.path.basename(args.input_file)
     out_file_name = args.out_folder + "/" + out_file_name
     np.savez(out_file_name, *feats)
-    np.save(out_file_name.replace(".npz", ".npy").replace("feature", "label"), labels)
+    np.save(out_file_name.replace(".feature.npz", ".label.npy"), labels)
     save_final_results(args, range_limit)
 
     # TODO: the range limit is correct, compression is indeed carried out and it is properly copyed inplace

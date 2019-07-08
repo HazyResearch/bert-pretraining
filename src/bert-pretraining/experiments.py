@@ -157,7 +157,7 @@ def bert_pretraining_3_seeds_different_size():
         print("cmd saved in ", file_name)
 
 def get_feature_path(exp_name, dataset, ckpt_folder, nbit=32, date_str=None):
-    if data_str is None:
+    if date_str is None:
         exp_path = "../../results/features/{}_{}".format(exp_name, utils.get_date_str())
     else:
         exp_path = "../../results/features/{}_{}".format(exp_name, data_str)
@@ -358,7 +358,7 @@ def tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model():
         print("cmd saved in ", script_name)
 
 def get_seed_from_folder_name(folder):
-    return int(folder.split("seed_")[0].split("_")[-1])
+    return int(folder.split("seed_")[1].split("_")[0])
 
 # compress all 768 dimensional features
 def compress_768_dim_features():
@@ -375,13 +375,14 @@ def compress_768_dim_features():
     with open(script_name, "w") as f:
         for dataset in datasets:
             for nbit in nbits:
-                full_prec_files = glob.glob("~/bert-pretraining/results/features/dimensionality_2019-07-06/{}/nbit_32/*dim_768*/*.feature.npz")
-                assert len(full_prec_files) == 6 # 3 seeds for wiki 17 and wiki 18 corpora
-                for feat_file in full_rec_files:
+                full_prec_files = glob.glob("/home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/{}/nbit_32/*dim_768*/*.feature.npz".format(dataset))
+                #print(full_prec_files)
+                assert len(full_prec_files) == 18 # 3 seeds for wiki 17 and wiki 18 corpora, each of these settings have 3 feature files
+                for feat_file in full_prec_files:
                     # we hack the ckpt_folder argument to reuse the get_feature path function
                     dummy_ckpt_folder = feat_file.split("/")[-2] 
-                    feat_path_comp = get_feature_path(exp_name, dataset, 
-                        ckpt_folder=dummy_ckpt_folder, nbit=nbit, date_str=None)
+                    feat_path_comp = os.path.abspath(get_feature_path(exp_name, dataset, 
+                        ckpt_folder=dummy_ckpt_folder, nbit=nbit, date_str=None))
                     seed = get_seed_from_folder_name(feat_file)
                     cmd = cmd_tmp.format(feat_file, feat_path_comp, nbit, dataset, seed)
                     f.write(cmd + "\n")
@@ -397,5 +398,5 @@ if __name__ == "__main__":
     # tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
     # get_best_lr_for_linear_bert_sentiment()
     # generate_all_predictions_for_linear_bert_sentiment()
-    tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model()
-
+    # tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model()
+    compress_768_dim_features()
