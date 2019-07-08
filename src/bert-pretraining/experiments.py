@@ -360,6 +360,12 @@ def tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model():
 def get_seed_from_folder_name(folder):
     return int(folder.split("seed_")[1].split("_")[0])
 
+def get_feature_bit(folder):
+    with open(folder + "/final_results.json", 'r') as f: 
+        config = json.load(f)
+    return config["nbit"]
+
+
 # compress all 768 dimensional features
 def compress_768_dim_features():
     script_name = SCRIPT_FOLDER + "/0708_generate_compressed_768_dim_features"
@@ -410,10 +416,13 @@ def generate_all_predictions_for_linear_bert_sentiment_compression():
                 #assert len(feature_folders) == 3 
                 for feature_folder in feature_folders:
                     feature_folder = os.path.abspath(feature_folder)
+                    nbit = get_feature_bit(feature_folder)
+                    assert "nbit_{}".format(nbit) in feature_folder
                     seed = get_seed_from_folder_name(feature_folder)
                     pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
                     pred_path += "_lr_{}".format(str(lr))
-                    feat_dim = int(feature_folder.split("dim_")[1].split("_")[0])
+                    print(feature_folder)
+                    feat_dim = int(feature_folder.split("dim_")[2].split("_")[0])
                     assert feat_dim == 768
                     cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
                     f.write(cmd + "\n")
