@@ -124,6 +124,10 @@ def clean_json_results(results):
                 result["corpus"] = "wiki17"
             if "wiki18" in result["feat_input_folder"]:
                 result["corpus"] = "wiki18"
+            nbit = int(result["feat_input_folder"].split("nbit_")[-1].split("/")[0])
+            result["nbit"] = nbit
+            dim = int(result["feat_input_folder"].split("dim_")[-1].split("_")[0])
+            result["dim"] = dim
         results_clean.append(result)
     return results_clean
 
