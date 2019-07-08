@@ -331,9 +331,11 @@ def generate_all_predictions_for_linear_bert_sentiment_dimensionality():
 
 
 # bert dimensionality experiments using lstm
-def tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model():
-    script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_lr_tuning_lstm"
-    datasets = ['mr', 'subj', 'mpqa', 'sst']
+def tune_lstm_bert_sentiment_with_wiki17_768_dim():
+    # script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_lr_tuning_lstm"
+    # datasets = ['mr', 'subj', 'mpqa', 'sst']
+    script_name = SCRIPT_FOLDER + "/0708_generate_prediction_for_dimensionality_lr_tuning_lstm_sst_only"
+    datasets = ['sst']
     nbit = 32
     lrs = [0.01, 0.001, 0.0001, 0.00001, 0.000001,]
     exp_name = "dimensionality_lstm_lr_tuning"
@@ -438,6 +440,6 @@ if __name__ == "__main__":
     # tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
     # get_best_lr_for_linear_bert_sentiment()
     # generate_all_predictions_for_linear_bert_sentiment_dimensionality()
-    # tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model()
-    # compress_768_dim_features()
-    generate_all_predictions_for_linear_bert_sentiment_compression()
+    tune_lstm_bert_sentiment_with_wiki17_768_dim()
+    # # compress_768_dim_features()
+    # generate_all_predictions_for_linear_bert_sentiment_compression()
