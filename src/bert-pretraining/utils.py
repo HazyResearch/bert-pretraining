@@ -1,4 +1,5 @@
 import tensorflow as tf
+import torch
 import numpy as np
 import sys, os
 import datetime
@@ -6,10 +7,25 @@ import logging
 import pathlib
 import json
 import glob
+import random
 
 def set_tensorflow_random_seed(rand_seed):
     random.seed(rand_seed)
     np.random.seed(rand_seed)
+    tf.set_random_seed(rand_seed)
+
+def set_random_seed(rand_seed):
+    # set random seed for python
+    random.seed(rand_seed)
+
+    # Set random seed for numpy
+    np.random.seed(seed=rand_seed)
+
+    # Set random seed for torch
+    torch.manual_seed(rand_seed)
+    torch.cuda.manual_seed(rand_seed)
+
+    # set random seed for tensorflow
     tf.set_random_seed(rand_seed)
 
 def get_date_str():
