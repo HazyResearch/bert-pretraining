@@ -297,7 +297,7 @@ def get_best_lr_for_linear_bert_sentiment():
         print(best_lr)
     return best_lr
 
-def generate_all_predictions_for_linear_bert_sentiment():
+def generate_all_predictions_for_linear_bert_sentiment_dimensionality():
     best_lr = get_best_lr_for_linear_bert_sentiment()
     # script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds"
     # datasets = ['mr', 'subj', 'mpqa', 'sst']
@@ -387,6 +387,37 @@ def compress_768_dim_features():
                     cmd = cmd_tmp.format(feat_file, feat_path_comp, nbit, dataset, seed)
                     f.write(cmd + "\n")
         print("cmd saved in ", script_name)
+
+def generate_all_predictions_for_linear_bert_sentiment_compression():
+    best_lr = get_best_lr_for_linear_bert_sentiment()
+    script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_compression_3_seeds"
+    datasets = ['mr', 'subj', 'mpqa', 'sst']
+    nbits = [32, 16, 8, 4, 2, 1]
+    exp_names = ["compression_opt_lr_3_seeds", "compression_default_lr_3_seeds"]
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
+        '--la --feat_input --feat_input_folder {} --feat_dim {} '
+        '--dataset {} --out {} --model_seed {} --lr {}\\"')
+    with open(script_name, "w") as f:
+        for exp_name in exp_names:
+            for dataset in datasets:
+                if "default" not in exp_name:
+                    lr = best_lr[dataset]
+                else:
+                    lr = 0.001
+                feature_folders = glob.glob("/home/zjian/bert-pretraining/results/features/compression_768_dim_2019-07-08/{}/nbit_*/*".format(dataset))
+                #assert len(feature_folders) == 3 
+                for feature_folder in feature_folders:
+                    feature_folder = os.path.abspath(feature_folder)
+                    seed = get_seed_from_folder_name(feature_folder)
+                    pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
+                    pred_path += "_lr_{}".format(str(lr))
+                    feat_dim = int(feature_folder.split("dim_")[1].split("_")[0])
+                    assert feat_dim == 768
+                    cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
+                    f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
     
     
 if __name__ == "__main__":
@@ -397,6 +428,7 @@ if __name__ == "__main__":
     # generate_all_sentiment_features_pytorch_file()
     # tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
     # get_best_lr_for_linear_bert_sentiment()
-    # generate_all_predictions_for_linear_bert_sentiment()
+    # generate_all_predictions_for_linear_bert_sentiment_dimensionality()
     # tune_lstm_bert_sentiment_with_wiki17_768_dim_linear_model()
-    compress_768_dim_features()
+    # compress_768_dim_features()
+    generate_all_predictions_for_linear_bert_sentiment_compression()
