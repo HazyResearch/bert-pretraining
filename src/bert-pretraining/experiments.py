@@ -363,7 +363,7 @@ def get_seed_from_folder_name(folder):
     return int(folder.split("seed_")[1].split("_")[0])
 
 def get_dataset_from_folder_name(folder):
-    return int(folder.split("/nbit_")[0].split("/")[-1])
+    return folder.split("/nbit_")[0].split("/")[-1]
 
 def get_feature_bit(folder):
     with open(folder + "/final_results.json", 'r') as f: 
