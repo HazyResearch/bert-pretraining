@@ -615,7 +615,7 @@ def generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_
                 else:
                     lr = 0.001
                 feature_folders = glob.glob("../../results/features/dimensionality_2019-07-06/{}/nbit_32/*wiki17*".format(dataset))
-                feature_folders = glob.glob("../../results/features/dimensionality_2019-07-06/{}/nbit_32/*wiki18_aligned*".format(dataset))
+                feature_folders += glob.glob("../../results/features/dimensionality_2019-07-06/{}/nbit_32/*wiki18_aligned*".format(dataset))
                 #assert len(feature_folders) == 3 
                 for feature_folder in feature_folders:
                     feature_folder = os.path.abspath(feature_folder)
@@ -647,5 +647,5 @@ if __name__ == "__main__":
     # generate_all_predictions_for_linear_bert_sentiment_compression_aligned_wiki18()
     # generate_all_predictions_for_linear_bert_sentiment_dimensionality_wiki18_aligned()
     # The below is for running with new validation set based opt lr for sst
-    generate_all_predictions_for_linear_bert_sentiment_compression_sst_only_for_new_opt_lr()
+    # generate_all_predictions_for_linear_bert_sentiment_compression_sst_only_for_new_opt_lr()
     generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_new_opt_lr()
