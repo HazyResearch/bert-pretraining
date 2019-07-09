@@ -243,7 +243,7 @@ def get_pred_path_from_feature_path(exp_name, dataset, feat_folder, nbit=32, dat
     if date_str is None:
         exp_path = "../../results/predictions/{}_{}".format(exp_name, utils.get_date_str())
     else:
-        exp_path = "../../results/predictions/{}_{}".format(exp_name, data_str)
+        exp_path = "../../results/predictions/{}_{}".format(exp_name, date_str)
     feat_name = feat_folder.split("/")[-1]
     folder = exp_path + "/{}/nbit_{}/{}".format(dataset, nbit, feat_name)
     return os.path.abspath(folder)
