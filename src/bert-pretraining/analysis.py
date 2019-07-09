@@ -39,9 +39,13 @@ def print_all_stab_vs_dim_for_linear_bert_sentiment():
     for exp_name in exp_names:
         print("\n\n", exp_name)
         for dataset in datasets:    
-            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_2019-07-07/{}/nbit_32/*/final_results.json".format(exp_name, dataset)
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_2019-07-07/{}/nbit_32/*wiki17*/final_results.json".format(exp_name, dataset)
             # filter by dataset and setting
             results = utils.clean_json_results(utils.gather_json_results(json_regex))
+            assert len(results) == 15, json_regex
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_2019-07-07/{}/nbit_32/*wiki18_aligned*/final_results.json".format(exp_name, dataset)
+            # filter by dataset and setting
+            results += utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results) == 30, json_regex
             print("\n\n", dataset)
             data_list = get_wiki17_wiki18_pred_disagreement_vs_dim(results)
@@ -90,11 +94,16 @@ def print_all_stab_vs_compression_for_linear_bert_sentiment():
     for exp_name in exp_names:
         print("\n\n", exp_name)
         for dataset in datasets:    
-            json_regex = "/home/zjian/bert-pretraining/results/predictions/compression_{}_lr_3_seeds_2019-07-08/{}/nbit_*/*/final_results.json".format(exp_name, dataset)
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/compression_{}_lr_3_seeds_2019-07-08/{}/nbit_*/*wiki17*/final_results.json".format(exp_name, dataset)
             # filter by dataset and setting
             results = utils.clean_json_results(utils.gather_json_results(json_regex))
-            assert len(results) == 36, json_regex # 2 corpus x 3 seeds x 6 precision
+            assert len(results) == 18, json_regex # 1 corpus x 3 seeds x 6 precision
             print("\n\n", dataset)
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/compression_{}_lr_3_seeds_2019-07-08/{}/nbit_*/*wiki18_aligned*/final_results.json".format(exp_name, dataset)
+            # filter by dataset and setting
+            results += utils.clean_json_results(utils.gather_json_results(json_regex))
+            assert len(results) == 36, json_regex # 1 corpus x 3 seeds x 6 precision
+
             data_list = get_wiki17_wiki18_pred_disagreement_generic(results, 
                 xlabel="nbit", xvalues=[1,2,4,8,16,32], subset_dict={"feat_dim": [768]})
             print(data_list)
@@ -103,7 +112,7 @@ def print_all_stab_vs_compression_for_linear_bert_sentiment():
 
 
 if __name__ == "__main__":
-    # print_all_stab_vs_dim_for_linear_bert_sentiment()
+    print_all_stab_vs_dim_for_linear_bert_sentiment()
     print_all_stab_vs_compression_for_linear_bert_sentiment()
 
     
