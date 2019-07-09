@@ -362,6 +362,9 @@ def tune_lstm_bert_sentiment_with_wiki17_768_dim():
 def get_seed_from_folder_name(folder):
     return int(folder.split("seed_")[1].split("_")[0])
 
+def get_dataset_from_folder_name(folder):
+    return int(folder.split("/nbit_")[0].split("/")[-1])
+
 def get_feature_bit(folder):
     with open(folder + "/final_results.json", 'r') as f: 
         config = json.load(f)
@@ -429,8 +432,26 @@ def generate_all_predictions_for_linear_bert_sentiment_compression():
                     cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
                     f.write(cmd + "\n")
         print("cmd saved in ", script_name)
-    
-    
+
+def generate_aligned_wiki18_full_prec_features():
+    train_feat_files = glob.glob("/home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/*/*/*wiki18/*.train.feature.npz")
+    assert len(train_feat_files) == 4 * 3 * 5 # 4 dataset, 3 seeds, 5 dim
+    script_name = SCRIPT_FOLDER + "/0708_generate_aligned_wiki18_full_prec_features"
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/run_compress.py '
+        '--job_type procrustes --input_file {} --procrustes_ref_input_file {} --out_folder {} '
+        '--dataset {} --seed {} \\"')
+    with open(script_name, "w") as f:
+        for train_feat_file in train_feat_files:
+            train_feat_ref_file = train_feat_file.replace("wiki18", "wiki17")
+            out_folder = os.path.dirname(train_feat_file) + "_aligned"
+            seed = int(get_seed_from_folder_name(os.path.dirname(train_feat_file)))
+            dataset = get_dataset_from_folder_name(os.path.dirname(train_feat_file))
+            cmd = cmd_tmp.format(train_feat_file, train_feat_ref_file, out_folder, dataset, seed)
+            f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
+
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()
     # bert_pretraining_lr_tuning_evaluation()
@@ -440,6 +461,7 @@ if __name__ == "__main__":
     # tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model()
     # get_best_lr_for_linear_bert_sentiment()
     # generate_all_predictions_for_linear_bert_sentiment_dimensionality()
-    tune_lstm_bert_sentiment_with_wiki17_768_dim()
+    # tune_lstm_bert_sentiment_with_wiki17_768_dim()
     # # compress_768_dim_features()
     # generate_all_predictions_for_linear_bert_sentiment_compression()
+    generate_aligned_wiki18_full_prec_features()
