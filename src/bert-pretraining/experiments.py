@@ -301,7 +301,10 @@ def generate_all_predictions_for_linear_bert_sentiment_dimensionality():
     best_lr = get_best_lr_for_linear_bert_sentiment()
     # script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds"
     # datasets = ['mr', 'subj', 'mpqa', 'sst']
-    script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds_sst_rerun"
+    # script_name = SCRIPT_FOLDER + "/0707_generate_prediction_for_dimensionality_3_seeds_sst_rerun"
+    # datasets = ['sst']
+    # rerun with the best validation err based lr for optimal
+    script_name = SCRIPT_FOLDER + "/0709_generate_prediction_for_dimensionality_3_seeds_sst_rerun"
     datasets = ['sst']
     nbit = 32
     exp_names = ["dimensionality_opt_lr_3_seeds", "dimensionality_default_lr_3_seeds"]
@@ -543,6 +546,90 @@ def generate_all_predictions_for_linear_bert_sentiment_dimensionality_wiki18_ali
                     f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
+def rerun_failed_3072_dim_procrustes_and_training():
+    # generate the procrustes wiki 18 features
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/run_compress.py --job_type procrustes --input_file /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_1_dim_3072_wiki18/sst.train.feature.npz --procrustes_ref_input_file /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_1_dim_3072_wiki17/sst.train.feature.npz --out_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_1_dim_3072_wiki18_aligned --dataset sst --seed 1 \"'
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/run_compress.py --job_type procrustes --input_file /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_2_dim_3072_wiki18/sst.train.feature.npz --procrustes_ref_input_file /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_2_dim_3072_wiki17/sst.train.feature.npz --out_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_2_dim_3072_wiki18_aligned --dataset sst --seed 2 \"'
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/run_compress.py --job_type procrustes --input_file /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_3_dim_3072_wiki18/sst.train.feature.npz --procrustes_ref_input_file /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_3_dim_3072_wiki17/sst.train.feature.npz --out_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_3_dim_3072_wiki18_aligned --dataset sst --seed 3 \"'
+
+    # rerun 3072 dimensional training
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py --la --feat_input --feat_input_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_1_dim_3072_wiki18_aligned --feat_dim 3072 --dataset sst --out /home/zjian/bert-pretraining/results/predictions/dimensionality_opt_lr_3_seeds_2019-07-07/sst/nbit_32/pretrain_seed_1_dim_3072_wiki18_aligned_lr_1e-05 --model_seed 1 --lr 1e-05\"'
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py --la --feat_input --feat_input_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_1_dim_3072_wiki18_aligned --feat_dim 3072 --dataset sst --out /home/zjian/bert-pretraining/results/predictions/dimensionality_default_lr_3_seeds_2019-07-07/sst/nbit_32/pretrain_seed_1_dim_3072_wiki18_aligned_lr_0.001 --model_seed 1 --lr 0.001\"'
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py --la --feat_input --feat_input_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_2_dim_3072_wiki18_aligned --feat_dim 3072 --dataset sst --out /home/zjian/bert-pretraining/results/predictions/dimensionality_opt_lr_3_seeds_2019-07-07/sst/nbit_32/pretrain_seed_2_dim_3072_wiki18_aligned_lr_1e-05 --model_seed 2 --lr 1e-05\"'
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py --la --feat_input --feat_input_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_2_dim_3072_wiki18_aligned --feat_dim 3072 --dataset sst --out /home/zjian/bert-pretraining/results/predictions/dimensionality_default_lr_3_seeds_2019-07-07/sst/nbit_32/pretrain_seed_2_dim_3072_wiki18_aligned_lr_0.001 --model_seed 2 --lr 0.001\"'
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py --la --feat_input --feat_input_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_3_dim_3072_wiki18_aligned --feat_dim 3072 --dataset sst --out /home/zjian/bert-pretraining/results/predictions/dimensionality_opt_lr_3_seeds_2019-07-07/sst/nbit_32/pretrain_seed_3_dim_3072_wiki18_aligned_lr_1e-05 --model_seed 3 --lr 1e-05\"'
+    'qsub -V -b y -wd /home/zjian/bert-pretraining/wd /home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh \"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py --la --feat_input --feat_input_folder /home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/sst/nbit_32/pretrain_seed_3_dim_3072_wiki18_aligned --feat_dim 3072 --dataset sst --out /home/zjian/bert-pretraining/results/predictions/dimensionality_default_lr_3_seeds_2019-07-07/sst/nbit_32/pretrain_seed_3_dim_3072_wiki18_aligned_lr_0.001 --model_seed 3 --lr 0.001\"'
+
+
+def generate_all_predictions_for_linear_bert_sentiment_compression_sst_only_for_new_opt_lr():
+    best_lr = get_best_lr_for_linear_bert_sentiment()
+    script_name = SCRIPT_FOLDER + "/0709_generate_prediction_for_compression_3_seeds_sst_only_for_new_opt_lr"
+    datasets = ['sst']
+    nbits = [32, 16, 8, 4, 2, 1]
+    exp_names = ["compression_opt_lr_3_seeds"]
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
+        '--la --feat_input --feat_input_folder {} --feat_dim {} '
+        '--dataset {} --out {} --model_seed {} --lr {}\\"')
+    with open(script_name, "w") as f:
+        for exp_name in exp_names:
+            for dataset in datasets:
+                if "default" not in exp_name:
+                    lr = best_lr[dataset]
+                else:
+                    lr = 0.001
+                feature_folders = glob.glob("/home/zjian/bert-pretraining/results/features/compression_768_dim_2019-07-08/{}/nbit_*/*wiki17*".format(dataset))
+                feature_folders += glob.glob("/home/zjian/bert-pretraining/results/features/compression_768_dim_2019-07-08/{}/nbit_*/*wiki18_aligned*".format(dataset))
+                #assert len(feature_folders) == 3 
+                for feature_folder in feature_folders:
+                    feature_folder = os.path.abspath(feature_folder)
+                    nbit = get_feature_bit(feature_folder)
+                    assert "nbit_{}".format(nbit) in feature_folder
+                    seed = get_seed_from_folder_name(feature_folder)
+                    pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
+                    pred_path += "_lr_{}".format(str(lr))
+                    print(feature_folder)
+                    feat_dim = int(feature_folder.split("dim_")[2].split("_")[0])
+                    assert feat_dim == 768
+                    cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
+                    f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
+
+def generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_new_opt_lr():
+    best_lr = get_best_lr_for_linear_bert_sentiment()
+    script_name = SCRIPT_FOLDER + "/0709_generate_prediction_for_dimensionality_3_seeds_sst_rerun_new_opt_lr"
+    datasets = ['sst']
+    nbit = 32
+    exp_names = ["dimensionality_opt_lr_3_seeds", ]
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
+        '--la --feat_input --feat_input_folder {} --feat_dim {} '
+        '--dataset {} --out {} --model_seed {} --lr {}\\"')
+    with open(script_name, "w") as f:
+        for exp_name in exp_names:
+            for dataset in datasets:
+                if "default" not in exp_name:
+                    lr = best_lr[dataset]
+                else:
+                    lr = 0.001
+                feature_folders = glob.glob("../../results/features/dimensionality_2019-07-06/{}/nbit_32/*wiki17*".format(dataset))
+                feature_folders = glob.glob("../../results/features/dimensionality_2019-07-06/{}/nbit_32/*wiki18_aligned*".format(dataset))
+                #assert len(feature_folders) == 3 
+                for feature_folder in feature_folders:
+                    feature_folder = os.path.abspath(feature_folder)
+                    seed = int(feature_folder.split("seed_")[1].split("_")[0])
+                    pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
+                    pred_path += "_lr_{}".format(str(lr))
+                    feat_dim = int(feature_folder.split("dim_")[1].split("_")[0])
+                    cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
+                    f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
+
+
+
+
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()
     # bert_pretraining_lr_tuning_evaluation()
@@ -557,5 +644,8 @@ if __name__ == "__main__":
     # generate_all_predictions_for_linear_bert_sentiment_compression()
     # generate_aligned_wiki18_full_prec_features()
     # compress_768_dim_features_aligned_wiki18()
-    generate_all_predictions_for_linear_bert_sentiment_compression_aligned_wiki18()
-    generate_all_predictions_for_linear_bert_sentiment_dimensionality_wiki18_aligned()
+    # generate_all_predictions_for_linear_bert_sentiment_compression_aligned_wiki18()
+    # generate_all_predictions_for_linear_bert_sentiment_dimensionality_wiki18_aligned()
+    # The below is for running with new validation set based opt lr for sst
+    generate_all_predictions_for_linear_bert_sentiment_dimensionality()
+    generate_all_predictions_for_linear_bert_sentiment_compression()
