@@ -278,7 +278,7 @@ def tune_lr_bert_sentiment_with_wiki17_768_dim_linear_model():
 def get_best_lr_for_linear_bert_sentiment():
     datasets = ['mr', 'subj', 'mpqa', 'sst']
     lrs = [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001]
-    metric = "test_err"
+    metric = "best_valid_err"
     best_lr = {}
     for dataset in datasets:
         all_json_regex = "../../results/predictions/dimensionality_2019-07-07/{}/nbit_32/*/final_results.json".format(dataset)
@@ -289,8 +289,8 @@ def get_best_lr_for_linear_bert_sentiment():
             keys = {"lr": [lr]}
             subset_results = utils.extract_result_subset(results, keys)
             assert len(subset_results) == 3
-            ave, std = utils.stats_on_subset_json(subset_results, "test_err")
-            print(dataset, " lr ", lr, " test err ave/std", ave, std)
+            ave, std = utils.stats_on_subset_json(subset_results, metric)
+            print(dataset, " lr ", lr, " val err ave/std", ave, std)
             if ave < best_err:
                 best_err = ave
                 best_lr[dataset] = lr
