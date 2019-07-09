@@ -160,7 +160,7 @@ def get_feature_path(exp_name, dataset, ckpt_folder, nbit=32, date_str=None):
     if date_str is None:
         exp_path = "../../results/features/{}_{}".format(exp_name, utils.get_date_str())
     else:
-        exp_path = "../../results/features/{}_{}".format(exp_name, data_str)
+        exp_path = "../../results/features/{}_{}".format(exp_name, date_str)
     ckpt_name = ckpt_folder.split("/")[-1]
     folder = exp_path + "/{}/nbit_{}/{}".format(dataset, nbit, ckpt_name)
     return folder
@@ -467,7 +467,7 @@ def compress_768_dim_features_aligned_wiki18():
         for dataset in datasets:
             for nbit in nbits:
                 full_prec_files = glob.glob("/home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/{}/nbit_32/*dim_768*_wiki18_aligned/*.feature.npz".format(dataset))
-                #print(full_prec_files)
+#                print(len(full_prec_files), full_prec_files)
                 assert len(full_prec_files) == 9 # 3 seeds for wiki 18 corpora, each of these settings have 3 feature files
                 for feat_file in full_prec_files:
                     # we hack the ckpt_folder argument to reuse the get_feature path function
