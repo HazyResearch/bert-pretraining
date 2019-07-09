@@ -370,7 +370,6 @@ def get_feature_bit(folder):
         config = json.load(f)
     return config["nbit"]
 
-
 # compress all 768 dimensional features
 def compress_768_dim_features():
     script_name = SCRIPT_FOLDER + "/0708_generate_compressed_768_dim_features"
@@ -452,6 +451,34 @@ def generate_aligned_wiki18_full_prec_features():
             f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
+# compress all 768 dimensional features for aligned wiki18 features
+def compress_768_dim_features_aligned_wiki18():
+    script_name = SCRIPT_FOLDER + "/0708_generate_compressed_768_dim_features_aligned_wiki18"
+    datasets = ['mr', 'subj', 'mpqa', 'sst']
+    nbits = [32, 16, 8, 4, 2, 1]
+    exp_name = "compression_768_dim"
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/run_compress.py '
+        '--input_file {} --out_folder {} '
+        '--nbit {} --dataset {} --seed {} \\"')
+
+    with open(script_name, "w") as f:
+        for dataset in datasets:
+            for nbit in nbits:
+                full_prec_files = glob.glob("/home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/{}/nbit_32/*dim_768*_wiki18_aligned/*.feature.npz".format(dataset))
+                #print(full_prec_files)
+                assert len(full_prec_files) == 9 # 3 seeds for wiki 18 corpora, each of these settings have 3 feature files
+                for feat_file in full_prec_files:
+                    # we hack the ckpt_folder argument to reuse the get_feature path function
+                    dummy_ckpt_folder = feat_file.split("/")[-2] 
+                    feat_path_comp = os.path.abspath(get_feature_path(exp_name, dataset, 
+                        ckpt_folder=dummy_ckpt_folder, nbit=nbit, date_str="2019-07-08"))
+                    seed = get_seed_from_folder_name(feat_file)
+                    cmd = cmd_tmp.format(feat_file, feat_path_comp, nbit, dataset, seed)
+                    f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
+
 if __name__ == "__main__":
     # bert_pretraining_lr_tuning_training()
     # bert_pretraining_lr_tuning_evaluation()
@@ -464,4 +491,5 @@ if __name__ == "__main__":
     # tune_lstm_bert_sentiment_with_wiki17_768_dim()
     # # compress_768_dim_features()
     # generate_all_predictions_for_linear_bert_sentiment_compression()
-    generate_aligned_wiki18_full_prec_features()
+    # generate_aligned_wiki18_full_prec_features()
+    compress_768_dim_features_aligned_wiki18()

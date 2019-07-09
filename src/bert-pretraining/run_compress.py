@@ -99,7 +99,7 @@ def compression(feats, labels, args):
             assert np.max(feats[i]) - range_limit < NUM_TOL, "not clipped right max/limit {}/{}".format(np.max(feats[i]), range_limit)
             assert -range_limit - np.min(feats[i]) < NUM_TOL, "not clipped right max/limit {}/{}".format(np.min(feats[i]), -range_limit)
             assert np.unique(feats[i]).size <= 2**args.nbit, "more unique values than expected"
-    return feats, labels
+    return feats, labels, range_limit
 
 def procrustes(feats_train, feats_heldout, feats_test, train_labels, args):
     # sanity check the reference and main feature feature are indeed a pair
@@ -170,7 +170,7 @@ def main():
         # load the dataset
         feats = read_npy_feature(args.input_file)
         labels = read_npy_label(args.input_file.replace(".feature.npz", ".label.npy"))
-        feats, labels = compression(feats, labels, args)
+        feats, labels, range_limit = compression(feats, labels, args)
         save_final_results_compress(args, range_limit)
         # save the results back to the format
         out_file_name = os.path.basename(args.input_file)
