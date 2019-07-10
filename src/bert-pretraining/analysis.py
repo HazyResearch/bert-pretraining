@@ -58,7 +58,7 @@ def print_all_stab_vs_dim_for_linear_bert_sentiment():
             save_csv_with_error_bar(data_list, csv_name)
 
 
-def get_wiki17_wiki18_pred_disagreement_generic(results, xlabel, xvalues, seeds=[1,2,3], subset_dict=None, single_xvalue_for_wiki17=False):
+def get_wiki17_wiki18_pred_disagreement_generic(results, xlabel, xvalues, seeds=[1,2,3], subset_dict=None, single_xvalue_for_wiki17=False, results_ref=None):
     disagrs_all= []
     for seed in seeds:
         disagrs = []
@@ -69,8 +69,10 @@ def get_wiki17_wiki18_pred_disagreement_generic(results, xlabel, xvalues, seeds=
             else:
                 keys = {"corpus": ["wiki17"], "model_seed": [seed], xlabel: [x]}
             keys.update(subset_dict)
-
-            subset = utils.extract_result_subset(results, keys)
+            if single_xvalue_for_wiki17:
+                subset = utils.extract_result_subset(results_ref, keys)
+            else:
+                subset = utils.extract_result_subset(results, keys)
             #print("keys ",keys, len(results), len(subset))
             print(subset[0]["test_err"])
             assert len(subset) == 1
@@ -121,7 +123,8 @@ def print_all_stab_vs_compression_for_linear_bert_sentiment():
 
 def print_all_stab_vs_ensemble_for_linear_bert_sentiment():
     datasets = ['mr', 'subj', 'mpqa', 'sst']
-    exp_names = ['default', 'opt'] 
+    exp_names = ['default', 'opt']
+    feat_dim = 768
     for exp_name in exp_names:
         print("\n\n", exp_name)
         for dataset in datasets:
@@ -135,14 +138,14 @@ def print_all_stab_vs_ensemble_for_linear_bert_sentiment():
                 date_str = "2019-07-07"
             else:
                 date_str = "2019-07-09" 
-            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_{}/{}/nbit_*/*wiki17*/final_results.json".format(exp_name, date_str, dataset)
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_{}/{}/nbit_*/*dim_768*wiki17*/final_results.json".format(exp_name, date_str, dataset)
             # filter by dataset and setting
             results_ref = utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results_ref) == 3, json_regex # 1 corpus x 3 seeds
 
-            data_list = get_wiki17_wiki18_pred_disagreement_generic(results, results_ref,
+            data_list = get_wiki17_wiki18_pred_disagreement_generic(results, 
                 xlabel="ensemble_eps", xvalues=[0.0, 0.001, 0.01, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0], 
-                subset_dict={"feat_dim": [768]}, single_xvalue_for_wiki17=True)
+                subset_dict={"feat_dim": [768]}, single_xvalue_for_wiki17=True, results_ref=results_ref)
             print(data_list)
             csv_name = utils.get_csv_folder() + "/stab_vs_ensemble_{}_lr_dataset_{}.csv".format(exp_name, dataset)
             save_csv_with_error_bar(data_list, csv_name)
