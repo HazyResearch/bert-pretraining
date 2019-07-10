@@ -122,7 +122,9 @@ def clean_json_results(results):
         if "feat_input_folder" in result.keys():
             if "wiki17" in result["feat_input_folder"]:
                 result["corpus"] = "wiki17"
-            if "wiki18" in result["feat_input_folder"]:
+            elif "wiki18" in result["feat_input_folder"]:
+                result["corpus"] = "wiki18"
+            elif "ensemble" in result["feat_input_folder"]:
                 result["corpus"] = "wiki18"
             nbit = int(result["feat_input_folder"].split("nbit_")[-1].split("/")[0])
             result["nbit"] = nbit
