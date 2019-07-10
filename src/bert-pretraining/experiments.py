@@ -629,7 +629,7 @@ def generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_
 
 def generate_ensembled_full_prec_features():
     feat_folders_old = glob.glob("/home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/*/*/*dim_768*wiki17")
-    assert len(feat_folder_old) == 4 * 3 # 4 dataset, 3 seeds
+    assert len(feat_folders_old) == 4 * 3 # 4 dataset, 3 seeds
     script_name = SCRIPT_FOLDER + "/0709_generate_ensembled_full_prec_features"
     cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
         '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
@@ -641,11 +641,12 @@ def generate_ensembled_full_prec_features():
     with open(script_name, "w") as f:
         for feat_folder_old in feat_folders_old:
             for eps in eps_list:
-                feat_folder_new = train_feat_file.replace("wiki17", "wiki18_aligned")
+                assert "wiki17" in feat_folder_old
+                feat_folder_new = feat_folder_old.replace("wiki17", "wiki18_aligned")
                 # out_folder = os.path.dirname(train_feat_file) + "_aligned"
-                seed = int(get_seed_from_folder_name(os.path.dirname(feat_folder_old)))
-                dataset = get_dataset_from_folder_name(os.path.dirname(feat_folder_old))
-                out_folder = os.path.abspath(get_pred_path_from_feature_path(exp_name, dataset, feat_folder_old, nbit=32, date_str=None)) + "_eps_{}".format(eps)
+                seed = int(get_seed_from_folder_name(feat_folder_old))
+                dataset = get_dataset_from_folder_name(feat_folder_old)
+                out_folder = os.path.abspath(get_pred_path_from_feature_path(exp_name, dataset, feat_folder_old, nbit=32, date_str=None)).replace("wiki17", "") + "_eps_{}".format(eps)
                 cmd = cmd_tmp.format(feat_folder_old, feat_folder_new, out_folder, dataset, seed, eps)
                 f.write(cmd + "\n")
         print("cmd saved in ", script_name)

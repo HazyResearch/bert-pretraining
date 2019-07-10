@@ -195,9 +195,6 @@ def ensemble(data_new, data_old, eps):
     for i, (feat_old, feat_new) in enumerate(zip(feats_train_old, feats_train_new)):
         assert feat_old.shape == feat_new.shape
         feats_train.append(feat_new * eps + feat_old * (1 - eps))
-        print("check ", i, feats_train_old[i].ravel()[0], feats_train_new[i].ravel()[0], feats_train[i].ravel()[0])
-        # if i == 10:
-        #     exit(0)
 
     for feat_old, feat_new in zip(feats_heldout_old, feats_heldout_new):
         assert feat_old.shape == feat_new.shape
