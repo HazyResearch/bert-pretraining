@@ -38,12 +38,16 @@ def print_all_stab_vs_dim_for_linear_bert_sentiment():
     exp_names = ['default', 'opt'] 
     for exp_name in exp_names:
         print("\n\n", exp_name)
-        for dataset in datasets:    
-            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_2019-07-07/{}/nbit_32/*wiki17*/final_results.json".format(exp_name, dataset)
+        for dataset in datasets:
+            if exp_name == "default":
+                date_str = "2019-07-07"
+            else:
+                date_str = "2019-07-09"    
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_{}/{}/nbit_32/*wiki17*/final_results.json".format(exp_name, date_str, dataset)
             # filter by dataset and setting
             results = utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results) == 15, json_regex
-            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_2019-07-07/{}/nbit_32/*wiki18_aligned*/final_results.json".format(exp_name, dataset)
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/dimensionality_{}_lr_3_seeds_{}/{}/nbit_32/*wiki18_aligned*/final_results.json".format(exp_name, date_str, dataset)
             # filter by dataset and setting
             results += utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results) == 30, json_regex
@@ -63,9 +67,6 @@ def get_wiki17_wiki18_pred_disagreement_generic(results, xlabel, xvalues, seeds=
             keys = {"corpus": ["wiki17"], "model_seed": [seed], xlabel: [x]}
             keys.update(subset_dict)
 
-            #for test in results:
-            #    print(test["corpus"], test["model_seed"], test["out"], xlabel)
-            #    print(test["nbit"])
             subset = utils.extract_result_subset(results, keys)
             #print("keys ",keys, len(results), len(subset))
             print(subset[0]["test_err"])
@@ -93,13 +94,17 @@ def print_all_stab_vs_compression_for_linear_bert_sentiment():
     exp_names = ['default', 'opt'] 
     for exp_name in exp_names:
         print("\n\n", exp_name)
-        for dataset in datasets:    
-            json_regex = "/home/zjian/bert-pretraining/results/predictions/compression_{}_lr_3_seeds_2019-07-08/{}/nbit_*/*wiki17*/final_results.json".format(exp_name, dataset)
+        for dataset in datasets:
+            if exp_name == "default":
+                date_str = "2019-07-08"
+            else:
+                date_str = "2019-07-09"  
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/compression_{}_lr_3_seeds_{}/{}/nbit_*/*wiki17*/final_results.json".format(exp_name, date_str, dataset)
             # filter by dataset and setting
             results = utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results) == 18, json_regex # 1 corpus x 3 seeds x 6 precision
             print("\n\n", dataset)
-            json_regex = "/home/zjian/bert-pretraining/results/predictions/compression_{}_lr_3_seeds_2019-07-08/{}/nbit_*/*wiki18_aligned*/final_results.json".format(exp_name, dataset)
+            json_regex = "/home/zjian/bert-pretraining/results/predictions/compression_{}_lr_3_seeds_{}/{}/nbit_*/*wiki18_aligned*/final_results.json".format(exp_name, date_str, dataset)
             # filter by dataset and setting
             results += utils.clean_json_results(utils.gather_json_results(json_regex))
             assert len(results) == 36, json_regex # 1 corpus x 3 seeds x 6 precision
