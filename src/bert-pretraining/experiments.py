@@ -664,6 +664,7 @@ def generate_all_predictions_for_linear_bert_sentiment_ensemble():
         '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
         '--la --feat_input --feat_input_folder {} --feat_dim {} '
         '--dataset {} --out {} --model_seed {} --lr {}\\"')
+    feat_dim = 768
     with open(script_name, "w") as f:
         for exp_name in exp_names:
             for dataset in datasets:
@@ -675,14 +676,12 @@ def generate_all_predictions_for_linear_bert_sentiment_ensemble():
                 #assert len(feature_folders) == 3 
                 for feature_folder in feature_folders:
                     feature_folder = os.path.abspath(feature_folder)
-                    nbit = get_feature_bit(feature_folder)
                     assert "nbit_{}".format(nbit) in feature_folder
                     seed = get_seed_from_folder_name(feature_folder)
                     pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
                     pred_path += "_lr_{}".format(str(lr))
                     print(feature_folder)
-                    feat_dim = int(feature_folder.split("dim_")[2].split("_")[0])
-                    assert feat_dim == 768
+                    assert "dim_{}".format(feat_dim) in feature_folder
                     cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
                     f.write(cmd + "\n")
         print("cmd saved in ", script_name)
