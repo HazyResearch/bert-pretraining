@@ -627,7 +627,28 @@ def generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_
                     f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
-
+def generate_ensembled_full_prec_features():
+    feat_folders_old = glob.glob("/home/zjian/bert-pretraining/results/features/dimensionality_2019-07-06/*/*/*dim_768*wiki17")
+    assert len(feat_folder_old) == 4 * 3 # 4 dataset, 3 seeds
+    script_name = SCRIPT_FOLDER + "/0709_generate_ensembled_full_prec_features"
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/run_compress.py '
+        '--job_type ensemble --old_input_folder {} --new_input_folder {} --out_folder {} '
+        '--dataset {} --seed {} --ensemble_eps {} \\"')
+    eps_list = [0.0, 0.001, 0.01, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0]   
+    exp_name = "ensemble"
+    with open(script_name, "w") as f:
+        for feat_folder_old in feat_folders_old:
+            for eps in eps_list:
+                feat_folder_new = train_feat_file.replace("wiki17", "wiki18_aligned")
+                # out_folder = os.path.dirname(train_feat_file) + "_aligned"
+                seed = int(get_seed_from_folder_name(os.path.dirname(feat_folder_old)))
+                dataset = get_dataset_from_folder_name(os.path.dirname(feat_folder_old))
+                out_folder = os.path.abspath(get_pred_path_from_feature_path(exp_name, dataset, feat_folder_old, nbit=32, date_str=None)) + "_eps_{}".format(eps)
+                cmd = cmd_tmp.format(feat_folder_old, feat_folder_new, out_folder, dataset, seed, eps)
+                f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
 
 
 if __name__ == "__main__":
@@ -648,4 +669,5 @@ if __name__ == "__main__":
     # generate_all_predictions_for_linear_bert_sentiment_dimensionality_wiki18_aligned()
     # The below is for running with new validation set based opt lr for sst
     # generate_all_predictions_for_linear_bert_sentiment_compression_sst_only_for_new_opt_lr()
-    generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_new_opt_lr()
+    # generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_new_opt_lr()
+    generate_ensembled_full_prec_features()
