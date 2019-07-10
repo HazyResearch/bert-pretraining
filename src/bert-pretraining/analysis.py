@@ -125,7 +125,7 @@ def print_all_stab_vs_ensemble_for_linear_bert_sentiment():
     for exp_name in exp_names:
         print("\n\n", exp_name)
         for dataset in datasets:
-            date_str = "2019-07-09"  
+            date_str = "2019-07-10"  
             json_regex = "/home/zjian/bert-pretraining/results/predictions/ensemble_{}_lr_3_seeds_{}/{}/nbit_*/*eps*/final_results.json".format(exp_name, date_str, dataset)
             # filter by dataset and setting
             results = utils.clean_json_results(utils.gather_json_results(json_regex))

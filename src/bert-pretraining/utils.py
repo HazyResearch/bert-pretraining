@@ -130,6 +130,9 @@ def clean_json_results(results):
             result["nbit"] = nbit
             dim = int(result["feat_input_folder"].split("dim_")[-1].split("_")[0])
             result["dim"] = dim
+            if "ensemble" in result["feat_input_folder"]:
+                assert "_eps" in result.keys()
+                result["ensemble_eps"].float(result["feat_input_folder"].split("_eps_")[-1].split("_")[0])
         results_clean.append(result)
     return results_clean
 
