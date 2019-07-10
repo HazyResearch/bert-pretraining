@@ -74,7 +74,7 @@ def get_wiki17_wiki18_pred_disagreement_generic(results, xlabel, xvalues, seeds=
             else:
                 subset = utils.extract_result_subset(results, keys)
             #print("keys ",keys, len(results), len(subset))
-            print(subset[0]["test_err"])
+            print(keys, subset[0]["test_err"])
             assert len(subset) == 1
             wiki17_pred = subset[0]["test_pred"]
 
@@ -82,7 +82,7 @@ def get_wiki17_wiki18_pred_disagreement_generic(results, xlabel, xvalues, seeds=
             keys = {"corpus": ["wiki18"], "model_seed": [seed], xlabel: [x]}
             keys.update(subset_dict)
             subset = utils.extract_result_subset(results, keys)
-            print(subset[0]["test_err"])
+            print(keys, subset[0]["test_err"])
             assert len(subset) == 1
             wiki18_pred = subset[0]["test_pred"]
             disagrs.append(utils.get_classification_disagreement(wiki17_pred, wiki18_pred))
