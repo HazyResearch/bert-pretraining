@@ -646,9 +646,45 @@ def generate_ensembled_full_prec_features():
                 # out_folder = os.path.dirname(train_feat_file) + "_aligned"
                 seed = int(get_seed_from_folder_name(feat_folder_old))
                 dataset = get_dataset_from_folder_name(feat_folder_old)
-                out_folder = os.path.abspath(get_pred_path_from_feature_path(exp_name, dataset, feat_folder_old, nbit=32, date_str=None)).replace("wiki17", "") + "_eps_{}".format(eps)
+                out_folder = os.path.abspath(get_pred_path_from_feature_path(exp_name, dataset, feat_folder_old, nbit=32, date_str=None)).replace("wiki17", "").replace("predictions", "features") + "_eps_{}".format(eps)
                 cmd = cmd_tmp.format(feat_folder_old, feat_folder_new, out_folder, dataset, seed, eps)
                 f.write(cmd + "\n")
+        print("cmd saved in ", script_name)
+    # the results folders above in this function are manually moved to the features folder from prediciton folder
+
+
+def generate_all_predictions_for_linear_bert_sentiment_ensemble():
+    best_lr = get_best_lr_for_linear_bert_sentiment()
+    script_name = SCRIPT_FOLDER + "/0709_generate_prediction_for_ensemble_3_seeds"
+    datasets = ['mr', 'subj', 'mpqa', 'sst']
+    nbit = 32
+    exp_names = ["ensemble_opt_lr_3_seeds", "ensemble_default_lr_3_seeds"]
+    cmd_tmp = ('qsub -V -b y -wd /home/zjian/bert-pretraining/wd '
+        '/home/zjian/bert-pretraining/src/bert-pretraining/gc_env.sh '
+        '\\"python /home/zjian/bert-pretraining/src/bert-pretraining/third_party/sentence_classification/train_classifier_feat_input.py '
+        '--la --feat_input --feat_input_folder {} --feat_dim {} '
+        '--dataset {} --out {} --model_seed {} --lr {}\\"')
+    with open(script_name, "w") as f:
+        for exp_name in exp_names:
+            for dataset in datasets:
+                if "default" not in exp_name:
+                    lr = best_lr[dataset]
+                else:
+                    lr = 0.001
+                feature_folders = glob.glob("/home/zjian/bert-pretraining/results/features/ensemble_2019-07-10/{}/nbit_*/*".format(dataset))
+                #assert len(feature_folders) == 3 
+                for feature_folder in feature_folders:
+                    feature_folder = os.path.abspath(feature_folder)
+                    nbit = get_feature_bit(feature_folder)
+                    assert "nbit_{}".format(nbit) in feature_folder
+                    seed = get_seed_from_folder_name(feature_folder)
+                    pred_path = get_pred_path_from_feature_path(exp_name, dataset, feature_folder, nbit)
+                    pred_path += "_lr_{}".format(str(lr))
+                    print(feature_folder)
+                    feat_dim = int(feature_folder.split("dim_")[2].split("_")[0])
+                    assert feat_dim == 768
+                    cmd = cmd_tmp.format(feature_folder, feat_dim, dataset, pred_path, str(seed), str(lr))
+                    f.write(cmd + "\n")
         print("cmd saved in ", script_name)
 
 
@@ -672,3 +708,4 @@ if __name__ == "__main__":
     # generate_all_predictions_for_linear_bert_sentiment_compression_sst_only_for_new_opt_lr()
     # generate_all_predictions_for_linear_bert_sentiment_dimensionality_sst_rerun_new_opt_lr()
     generate_ensembled_full_prec_features()
+    generate_all_predictions_for_linear_bert_sentiment_ensemble()
