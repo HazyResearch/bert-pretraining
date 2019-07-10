@@ -40,10 +40,7 @@ def get_label_file(dataset, folder, datapart="train"):
     else:
         raise Exception("Datapart", datapart, " not supported!")
 
-def load_procrustes_data(args):
-    assert "train.feature.npz" in args.input_file
-    dataset = args.dataset
-    folder = os.path.dirname(args.input_file)
+def load_dataset_feat(folder, dataset):
     feats_train = read_npy_feature(get_feature_file(dataset, folder, "train"))
     feats_heldout = read_npy_feature(get_feature_file(dataset, folder, "heldout"))
     feats_test = read_npy_feature(get_feature_file(dataset, folder, "test"))
@@ -53,7 +50,31 @@ def load_procrustes_data(args):
     return feats_train, feats_heldout, feats_test, \
         labels_train, labels_heldout, labels_test
 
-def save_procrustes_data(args, feats_train, feats_heldout, feats_test,
+def load_procrustes_data(args):
+    assert "train.feature.npz" in args.input_file
+    dataset = args.dataset
+    folder = os.path.dirname(args.input_file)
+    return load_dataset_feat(folder, dataset)
+    # feats_train = read_npy_feature(get_feature_file(dataset, folder, "train"))
+    # feats_heldout = read_npy_feature(get_feature_file(dataset, folder, "heldout"))
+    # feats_test = read_npy_feature(get_feature_file(dataset, folder, "test"))
+    # labels_train = read_npy_label(get_label_file(dataset, folder, "train"))
+    # labels_heldout = read_npy_label(get_label_file(dataset, folder, "heldout"))
+    # labels_test = read_npy_label(get_label_file(dataset, folder, "test"))
+    # return feats_train, feats_heldout, feats_test, \
+    #     labels_train, labels_heldout, labels_test
+
+def load_ensemble_data(args):
+    dataset = args.dataset
+    folder = args.new_input_folder
+    new_dataset = load_dataset_feat(folder, dataset)
+    logging.info("new feature from " + folder)
+    folder = args.old_input_folder
+    old_dataset = load_dataset_feat(folder, dataset)
+    logging.info("old feature from " + folder)
+    return new_dataset, old_dataset
+
+def save_data_feat(args, feats_train, feats_heldout, feats_test,
     labels_train, labels_heldout, labels_test):
     folder = args.out_folder
     dataset = args.dataset
@@ -64,12 +85,17 @@ def save_procrustes_data(args, feats_train, feats_heldout, feats_test,
     np.save(get_label_file(dataset, folder, "heldout"), labels_heldout)
     np.save(get_label_file(dataset, folder, "test"), labels_test)
 
+
 def save_final_results_compress(args, range_limit):
     results = args.__dict__
     results["results"] = {"range_limit": range_limit}
     utils.save_to_json(results, args.out_folder + "/final_results.json")
 
 def save_final_results_procrutes(args):
+    results = args.__dict__
+    utils.save_to_json(results, args.out_folder + "/final_results.json")
+
+def save_final_results_ensemble(args):
     results = args.__dict__
     utils.save_to_json(results, args.out_folder + "/final_results.json")
 
@@ -142,11 +168,52 @@ def procrustes(feats_train, feats_heldout, feats_test, train_labels, args):
         feats_test_rot.append(feat @ R)
     return feats_train_rot, feats_heldout_rot, feats_test_rot
 
+def ensemble(data_new, data_old, eps):
+    # the ensembled feature = eps * new embedding + (1 - eps) * old embedding
+    assert eps >= 0.0
+    assert eps <= 1.0
+    (feats_train_old, feats_heldout_old, feats_test_old, \
+        labels_train_old, labels_heldout_old, labels_test_old) = data_old
+    (feats_train_new, feats_heldout_new, feats_test_new, \
+        labels_train_new, labels_heldout_new, labels_test_new) = data_new
+    np.testing.assert_array_equal(labels_train_old, labels_train_new)
+    np.testing.assert_array_equal(labels_heldout_old, labels_heldout_new)
+    np.testing.assert_array_equal(labels_test_old, labels_test_new)
+    assert not np.array_equal(feats_train_old, feats_train_new)
+    assert not np.array_equal(feats_heldout_old, feats_heldout_new)
+    assert not np.array_equal(feats_test_old, feats_test_new)
+
+    feats_train = []
+    feats_heldout = []
+    feats_test = []
+    labels_train = labels_train_new
+    labels_heldout = labels_heldout_new
+    labels_test = labels_test_new
+
+    logging.info("ensembling with weights {} for new feature/embeddings".format(eps))
+
+    for i, (feat_old, feat_new) in enumerate(zip(feats_train_old, feats_train_new)):
+        assert feat_old.shape == feat_new.shape
+        feats_train.append(feat_new * eps + feat_old * (1 - eps))
+        print("check ", i, feats_train_old[i].ravel()[0], feats_train_new[i].ravel()[0], feats_train[i].ravel()[0])
+        # if i == 10:
+        #     exit(0)
+
+    for feat_old, feat_new in zip(feats_heldout_old, feats_heldout_new):
+        assert feat_old.shape == feat_new.shape
+        feats_heldout.append(feat_new * eps + feat_old * (1 - eps))
+
+    for feat_old, feat_new in zip(feats_test_old, feats_test_new):
+        assert feat_old.shape == feat_new.shape
+        feats_test.append(feat_new * eps + feat_old * (1 - eps))
+
+    return feats_train, feats_heldout, feats_test, labels_train, labels_heldout, labels_test
+
 
 def main():
     # add arguments
     argparser = argparse.ArgumentParser(sys.argv[0], conflict_handler='resolve')
-    argparser.add_argument("--job_type", type=str, default="compression", choices=["compression", "procrustes"])
+    argparser.add_argument("--job_type", type=str, default="compression", choices=["compression", "procrustes", "ensemble"])
     argparser.add_argument("--input_file", type=str, help="The feature file to be compressed.")
     argparser.add_argument("--procrustes_ref_input_file", type=str, help="For procrustes, this specifies the reference we rotate the input file feature to.")
     argparser.add_argument("--out_folder", type=str, help="The folder to contain the output")
@@ -155,6 +222,9 @@ def main():
     argparser.add_argument("--seed", type=int, help="Random seeds for the sampleing process.")
     argparser.add_argument("--golden_sec_tol", type=float, default=1e-3,
         help="termination criterion for golden section search")
+    argparser.add_argument("--old_input_folder", type=str, help="old embedding for ensembling, e.g. wiki17 enbeddings")
+    argparser.add_argument("--new_input_folder", type=str, help="new embedding for ensembling, e.g. wiki18 aligned")
+    argparser.add_argument("--ensemble_eps", type=float, help="the ensembling weights for new embedding, e.g. wiki18 aligned")
     args = argparser.parse_args()
 
     # assert args.dataset in args.input_file
@@ -181,10 +251,16 @@ def main():
         feats_train, feats_heldout, feats_test, \
             labels_train, labels_heldout, labels_test = load_procrustes_data(args)
         feats_train, feats_heldout, feats_test = procrustes(feats_train, feats_heldout, feats_test, labels_train, args)
-        save_procrustes_data(args, feats_train, feats_heldout, feats_test,
+        save_data_feat(args, feats_train, feats_heldout, feats_test,
             labels_train, labels_heldout, labels_test)
         save_final_results_procrutes(args)
-
+    elif args.job_type == "ensemble":
+        new_dataset, old_dataset = load_ensemble_data(args)
+        feats_train, feats_heldout, feats_test, \
+            labels_train, labels_heldout, labels_test = ensemble(new_dataset, old_dataset, args.ensemble_eps)
+        save_data_feat(args, feats_train, feats_heldout, feats_test,
+            labels_train, labels_heldout, labels_test)
+        save_final_results_ensemble(args)
     # TODO: the range limit is correct, compression is indeed carried out and it is properly copyed inplace
     # TODO: check a direct through saving case, check a compressed case to see the similarity
     # sanity check on if the tol is reasoanble
