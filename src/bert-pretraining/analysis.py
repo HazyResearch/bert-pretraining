@@ -132,7 +132,7 @@ def get_wiki18_metric_generic(results, xlabel, xvalues, seeds=[1,2,3], subset_di
             print(keys, subset[0]["test_err"])
             assert len(subset) == 1
             quals.append(subset[0]["test_err"])
-        quals_all.append(disagrs)
+        quals_all.append(quals)
         # print("dim ", dim, "disagr. ave / std: ", np.mean(disagreements), np.std(disagreements))
     quals = np.array(quals_all)
     #print("all disagreement ", disagr.shape)
