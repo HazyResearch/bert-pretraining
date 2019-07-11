@@ -54,7 +54,7 @@ def print_all_stab_vs_dim_for_linear_bert_sentiment():
             print("\n\n", dataset)
             data_list = get_wiki17_wiki18_pred_disagreement_vs_dim(results)
             print(data_list)
-            data_list[2] = [x * 100.0 for x in data_list[2]]
+            data_list[0][2] = [x * 100.0 for x in data_list[0][2]]
             csv_name = utils.get_csv_folder() + "/stab_vs_dim_{}_lr_dataset_{}.csv".format(exp_name, dataset)
             save_csv_with_error_bar(data_list, csv_name)
 
@@ -118,7 +118,7 @@ def print_all_stab_vs_compression_for_linear_bert_sentiment():
             data_list = get_wiki17_wiki18_pred_disagreement_generic(results, 
                 xlabel="nbit", xvalues=[1,2,4,8,16,32], subset_dict={"feat_dim": [768]})
             print(data_list)
-            data_list[2] = [x * 100.0 for x in data_list[2]]
+            data_list[0][2] = [x * 100.0 for x in data_list[0][2]]
             csv_name = utils.get_csv_folder() + "/stab_vs_comp_{}_lr_dataset_{}.csv".format(exp_name, dataset)
             save_csv_with_error_bar(data_list, csv_name)
 
@@ -167,7 +167,7 @@ def print_all_stab_vs_ensemble_for_linear_bert_sentiment():
                 xlabel="ensemble_eps", xvalues=[0.0, 0.001, 0.01, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0], 
                 subset_dict={"feat_dim": [768]}, single_xvalue_for_wiki17=True, results_ref=results_ref)
             print(data_list)
-            data_list[2] = [x * 100.0 for x in data_list[2]]
+            data_list[0][2] = [x * 100.0 for x in data_list[0][2]]
             csv_name = utils.get_csv_folder() + "/stab_vs_ensemble_{}_lr_dataset_{}.csv".format(exp_name, dataset)
             save_csv_with_error_bar(data_list, csv_name)
 
