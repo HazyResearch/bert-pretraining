@@ -2,8 +2,17 @@ import glob
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import rc
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+## for Palatino and other serif fonts use:
+#rc('font',**{'family':'serif','serif':['Palatino']})
+rc('text', usetex=True)
 
 import plot_utils
+
+LABEL_FONT_SIZE = 22
+TITLE_FONT_SIZE = 22
+TICKER_FONT_SIZE = 19
 
 def plot_all_bert_stab_vs_dim():
 	all_csv = glob.glob("./output/csv/stab_vs_dim*.csv")
@@ -13,12 +22,14 @@ def plot_all_bert_stab_vs_dim():
 		plot_utils.plot_figure_with_error_bar(names, data, color_list="b")
 		# replace suffix and folder for pdf
 		print(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
-		plt.title(csv_name.split("dataset_")[1].split(".")[0], fontsize=17)
-		plt.ylabel("Disagreement %", fontsize=17)
-		plt.xlabel("Dimentionality", fontsize=17)
+		plt.title(csv_name.split("dataset_")[1].split(".")[0], fontsize=TITLE_FONT_SIZE)
+		plt.ylabel("% Disagreement", fontsize=LABEL_FONT_SIZE)
+		plt.xlabel("Dimentionality", fontsize=LABEL_FONT_SIZE)
 		plt.xscale("log")
-		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
-		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"))
+		plt.tick_params(axis='both', which='major', labelsize=TICKER_FONT_SIZE)
+		plt.tick_params(axis='both', which='minor', labelsize=TICKER_FONT_SIZE)
+		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"), bbox_inches="tight")
+		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"), bbox_inches="tight")
 		plt.close()
 
 def plot_all_bert_stab_vs_comp():
@@ -29,12 +40,14 @@ def plot_all_bert_stab_vs_comp():
 		plot_utils.plot_figure_with_error_bar(names, data, color_list="b")
 		# replace suffix and folder for pdf
 		print(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
-		plt.title(csv_name.split("dataset_")[1].split(".")[0], fontsize=17)
-		plt.ylabel("Disagreement %", fontsize=17)
-		plt.xlabel("precision", fontsize=17)
+		plt.title(csv_name.split("dataset_")[1].split(".")[0], fontsize=TITLE_FONT_SIZE)
+		plt.ylabel("% Disagreement", fontsize=LABEL_FONT_SIZE)
+		plt.xlabel("precision", fontsize=LABEL_FONT_SIZE)
 		plt.xscale("log")
-		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
-		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"))
+		plt.tick_params(axis='both', which='major', labelsize=TICKER_FONT_SIZE)
+		plt.tick_params(axis='both', which='minor', labelsize=TICKER_FONT_SIZE)
+		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"), bbox_inches="tight")
+		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"), bbox_inches="tight")
 		plt.close()
 
 def plot_all_bert_stab_vs_ensemble():
@@ -45,15 +58,39 @@ def plot_all_bert_stab_vs_ensemble():
 		plot_utils.plot_figure_with_error_bar(names, data, color_list="b")
 		# replace suffix and folder for pdf
 		print(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
-		plt.title(csv_name.split("dataset_")[1].split(".")[0], fontsize=17)
-		plt.ylabel("Disagreement %", fontsize=17)
-		plt.xlabel("Epsilon", fontsize=17)
+		plt.title(csv_name.split("dataset_")[1].split(".")[0], fontsize=TITLE_FONT_SIZE)
+		plt.ylabel("% Disagreement", fontsize=LABEL_FONT_SIZE)
+		plt.xlabel("Epsilon", fontsize=LABEL_FONT_SIZE)
 		# plt.xscale("log")
-		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
-		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"))
+		plt.tick_params(axis='both', which='major', labelsize=TICKER_FONT_SIZE)
+		plt.tick_params(axis='both', which='minor', labelsize=TICKER_FONT_SIZE)
+		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"), bbox_inches="tight")
+		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"), bbox_inches="tight")
 		plt.close()
 
+def plot_all_bert_qual_vs_ensemble():
+	all_csv = glob.glob("./output/csv/qual_vs_ensemble*.csv")
+	for csv_name in all_csv:
+		groups, names, data = plot_utils.csv_to_table(csv_name)
+		plt.figure()
+		plot_utils.plot_figure_with_error_bar(names, data, color_list="b")
+		# replace suffix and folder for pdf
+		print(csv_name.replace(".csv", ".pdf").replace("csv", "figure"))
+		plt.title(csv_name.split("dataset_")[1].split(".")[0], fontsize=TITLE_FONT_SIZE)
+		plt.ylabel("Test err.", fontsize=LABEL_FONT_SIZE)
+		plt.xlabel(r"$\epsilon$", fontsize=LABEL_FONT_SIZE)
+		# plt.xscale("log")
+		plt.tick_params(axis='both', which='major', labelsize=TICKER_FONT_SIZE)
+		plt.tick_params(axis='both', which='minor', labelsize=TICKER_FONT_SIZE)
+		plt.savefig(csv_name.replace(".csv", ".pdf").replace("csv", "figure"), bbox_inches="tight")
+		plt.savefig(csv_name.replace(".csv", ".png").replace("csv", "figure"), bbox_inches="tight")
+		plt.close()
+
+# cp /Users/Jian/Data/research/remote_repo/dawn8/bert-pretraining/src/bert-pretraining/output/csv/*.csv figures/bert_figures/csv/
+# cp /Users/Jian/Data/research/remote_repo/dawn8/bert-pretraining/src/bert-pretraining/output/figure/*.pdf figures/bert_figures/
+
 if __name__ == "__main__":
-	# plot_all_bert_stab_vs_dim()
-	# plot_all_bert_stab_vs_comp()
+	plot_all_bert_stab_vs_dim()
+	plot_all_bert_stab_vs_comp()
 	plot_all_bert_stab_vs_ensemble()
+	plot_all_bert_qual_vs_ensemble()
