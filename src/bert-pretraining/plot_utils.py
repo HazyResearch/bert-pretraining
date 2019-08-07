@@ -87,7 +87,7 @@ def plot_figure_without_error_bar(names, data, color_list, normalizer=1.0):
 #             plt.errorbar(x, average_y, yerr=std_y, label=label, marker=marker_list[i], markeredgecolor=color_list[i % len(color_list)], markerfacecolor="none", markersize=5, markeredgewidth=1, fmt="--", linewidth=1, capsize=5, capthick=1, color=color_list[i % len(color_list)])
 
 
-def plot_figure_with_error_bar(names, data, color_list, normalizer=1.0):
+def plot_figure_with_error_bar(names, data, color_list, normalizer=1.0, marker_size=8.0):
     '''
     each column of data is a line
     the name follows the pattern like ['fp Nystrom-x', 'fp Nystrom-y', 'fp Nystrom-y_std', 'fp RFF-x', 'fp RFF-y', 'fp RFF-y_std']
@@ -103,10 +103,10 @@ def plot_figure_with_error_bar(names, data, color_list, normalizer=1.0):
 #         print x, average_y, std_y
         if "FP" in label:
             print("FP mode plot")
-            plt.errorbar(x, average_y / normalizer, yerr=std_y / normalizer, label=label, marker=marker_list[i % len(marker_list)], markeredgecolor=color_list[i % len(color_list)], markerfacecolor="none", markersize=8, markeredgewidth=1.5, fmt="-", linewidth=1, capsize=5, capthick=1, color=color_list[i % len(color_list)])
+            plt.errorbar(x, average_y / normalizer, yerr=std_y / normalizer, label=label, marker=marker_list[i % len(marker_list)], markeredgecolor=color_list[i % len(color_list)], markersize=marker_size, markeredgewidth=1.5, fmt="-", linewidth=2, capsize=5, capthick=1, color=color_list[i % len(color_list)])
         else:
             print("LP mode plot")  
-            plt.errorbar(x, average_y / normalizer, yerr=std_y / normalizer, label=label, marker=marker_list[i % len(marker_list)], markeredgecolor=color_list[i % len(color_list)], markerfacecolor="none", markersize=8, markeredgewidth=1.5, fmt="-", linewidth=1, capsize=5, capthick=1, color=color_list[i % len(color_list)])
+            plt.errorbar(x, average_y / normalizer, yerr=std_y / normalizer, label=label, marker=marker_list[i % len(marker_list)], markeredgecolor=color_list[i % len(color_list)], markersize=marker_size, markeredgewidth=1.5, fmt="-", linewidth=2, capsize=5, capthick=1, color=color_list[i % len(color_list)])
             
 def plot_figure_with_error_bar2(names, data, color_list, normalizer=1.0):
     '''
